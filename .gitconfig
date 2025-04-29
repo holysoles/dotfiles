@@ -1,0 +1,8 @@
+[user]
+	email = holysoles97@gmail.com
+[push]
+	autoSetupRemote = true
+[pull]
+	rebase = true
+[init]
+	defaultBranch = main

@@ -1,0 +1,11 @@
+Applications/
+code/
+go/pkg/
+Nextcloud/
+.cache/
+.local/share/Trash/
+.var/
+.npm/
+.dotfiles/
+.dotnet/
+.config/evolution/
