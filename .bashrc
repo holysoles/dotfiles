@@ -96,6 +96,8 @@ alias alert='notify-send --urgency=low -i "$([ $? = 0 ] && echo terminal || echo
 alias co='cd ~/code/'
 alias rco='cd ~/remote-code/'
 alias nx='cd ~/Nextcloud/'
+alias k='kubectl'
+alias watchh='watch '
 
 # TAB COMPLETIONS
 if ! shopt -oq posix; then
@@ -107,6 +109,9 @@ if ! shopt -oq posix; then
 fi
 if command -v flux > /dev/null; then
     . <(flux completion bash)
+fi
+if command -v kubectl > /dev/null; then
+    . <(kubectl completion bash)
 fi
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
