@@ -4,6 +4,7 @@ case $- in
       *) return;;
 esac
 
+
 # SHELL OPTIONS
 # don't put duplicate lines or lines starting with space in the history.
 HISTCONTROL=ignoreboth
@@ -42,13 +43,21 @@ else
     PS1='${debian_chroot:+($debian_chroot)}\u@\h:\w\$ '
 fi
 unset color_prompt
+NORMAL="\[\033[00m\]"
+BLUE="\[\033[01;34m\]"
+YELLOW="\[\e[1;33m\]"
+GREEN="\[\e[1;32m\]"
+
+. ~/.kube-prompt.sh
 . ~/.git-prompt.sh
 GIT_PS1_SHOWCONFLICTSTATE="true"
 GIT_PS1_SHOWCOLORHINTS="true"
 GIT_PS1_SHOWDIRTYSTATE="true"
 GIT_PS1_SHOWUNTRACKEDFILES="true"
 GIT_PS1_SHOWUPSTREAM="true"
-PROMPT_COMMAND='PS1_CMD1=$(__git_ps1 "(%s)")'; PS1='${PS1_CMD1} \[\e[94m\]\W\[\e[0m\]> '
+PROMPT_COMMAND='KUBE_STATUS=$(__kube_ps1); GIT_STATUS=$(__git_ps1 "(%s)")'
+PS1='${KUBE_STATUS}${GIT_STATUS} \[\e[94m\]\W\[\e[0m\]> '
+
 
 # ENV
 if [ -f ~/.local/bin/env ]; then
@@ -64,8 +73,9 @@ if command -v nvim > /dev/null; then
 else
     export EDITOR=vi
 fi
-# colored GCC warnings and errors
-#export GCC_COLORS='error=01;31:warning=01;35:note=01;36:caret=01;32:locus=01:quote=01'
+if command -v kubectl > /dev/null; then
+    export KUBE_INSTALLED="true"
+fi
 
 
 # ALIASES
@@ -97,7 +107,9 @@ alias co='cd ~/code/'
 alias rco='cd ~/remote-code/'
 alias nx='cd ~/Nextcloud/'
 alias k='kubectl'
+alias ksw='kubectl config use-context'
 alias watchh='watch '
+
 
 # TAB COMPLETIONS
 if ! shopt -oq posix; then
@@ -110,7 +122,8 @@ fi
 if command -v flux > /dev/null; then
     . <(flux completion bash)
 fi
-if command -v kubectl > /dev/null; then
+
+if [ -n "$KUBE_INSTALLED" ]; then
     . <(kubectl completion bash)
 fi
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
