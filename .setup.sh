@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 set -euo pipefail
 
@@ -83,7 +83,7 @@ printf "\n\ninstalling uv..\n"
 wget -qO- https://astral.sh/uv/install.sh | sh > /dev/null
 
 # Now setup dotfiles
-function dot {
+dot () {
    /usr/bin/git --git-dir=$HOME/.dotfiles/ --work-tree=$HOME $@
 }
 
