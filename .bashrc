@@ -109,6 +109,7 @@ alias nx='cd ~/Nextcloud/'
 alias k='kubectl'
 alias ksw='kubectl config use-context'
 alias watchh='watch '
+alias flushdns='sudo resolvectl flush-caches'
 
 
 # TAB COMPLETIONS
