@@ -67,7 +67,8 @@ if [ -f ~/.bash_env ]; then
     . ~/.bash_env
 fi
 export NVM_DIR="$HOME/.nvm"
-export PATH=$PATH:/usr/local/go/bin
+export PATH="$PATH:/usr/local/go/bin"
+export PATH="$PATH:$(go env GOPATH)/bin"
 if command -v nvim > /dev/null; then
     export EDITOR=nvim
 else
@@ -110,7 +111,7 @@ alias k='kubectl'
 alias ksw='kubectl config use-context'
 alias watchh='watch '
 alias flushdns='sudo resolvectl flush-caches'
-
+alias cat='batcat'
 
 # TAB COMPLETIONS
 if ! shopt -oq posix; then

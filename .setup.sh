@@ -46,7 +46,7 @@ if [ "$DISTRO" = 'ubuntu' ]; then
         sudo add-apt-repository -y ppa:zhangsongcui3371/fastfetch > /dev/null
 fi
 sudo apt update -qq
-sudo apt install -y -qq git make gcc unzip ripgrep xsel fastfetch
+sudo apt install -qq git make gcc unzip ripgrep xsel fastfetch bat
 
 # node install for LSPs
 wget -qO- https://raw.githubusercontent.com/nvm-sh/nvm/HEAD/install.sh | bash > /dev/null
