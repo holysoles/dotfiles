@@ -69,6 +69,9 @@ fi
 export NVM_DIR="$HOME/.nvm"
 export PATH="$PATH:/usr/local/go/bin"
 export PATH="$PATH:$(go env GOPATH)/bin"
+if [ -d /home/patrick/.platformio/penv/bin ]; then
+    export PATH="$PATH:$HOME/.platformio/penv/bin/"
+fi
 if command -v nvim > /dev/null; then
     export EDITOR=nvim
 else
@@ -77,7 +80,6 @@ fi
 if command -v kubectl > /dev/null; then
     export KUBE_INSTALLED="true"
 fi
-
 
 # ALIASES
 #if [ -f ~/.bash_aliases ]; then
@@ -112,6 +114,15 @@ alias ksw='kubectl config use-context'
 alias watchh='watch '
 alias flushdns='sudo resolvectl flush-caches'
 alias cat='batcat'
+# functions
+function flux-retry-helm() {
+  local NAMESPACE="$1"
+  local HELMRELEASE="$2"
+
+  TOKEN="$(date +%s)"
+  kubectl annotate helmrelease --field-manager=flux-client-side-apply --overwrite -n "$NAMESPACE" "$HELMRELEASE" \
+    "reconcile.fluxcd.io/requestedAt=$TOKEN" "reconcile.fluxcd.io/forceAt=$TOKEN"
+}
 
 # TAB COMPLETIONS
 if ! shopt -oq posix; then
