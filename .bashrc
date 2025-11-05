@@ -114,6 +114,14 @@ alias ksw='kubectl config use-context'
 alias watchh='watch '
 alias flushdns='sudo resolvectl flush-caches'
 alias cat='batcat'
+CLIP=xsel
+PASTE=xsel
+if [ "$XDG_SESSION_TYPE" = 'wayland' ]; then
+	CLIP=wl-copy
+	PASTE=wl-paste
+fi
+alias clip=$CLIP
+alias paste=$PASTE
 # functions
 function flux-retry-helm() {
   local NAMESPACE="$1"

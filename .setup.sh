@@ -40,13 +40,18 @@ EOT
     fi
 fi
 
+CLIPMANAGER="xsel"
+if [ "$XDG_SESSION_TYPE" = 'wayland' ]; then
+	CLIP_MANAGER='wl-clipboard'
+fi
+
 
 printf "\n\ninstalling packages..\n"
 if [ "$DISTRO" = 'ubuntu' ]; then
         sudo add-apt-repository -y ppa:zhangsongcui3371/fastfetch > /dev/null
 fi
 sudo apt update -qq
-sudo apt install -qq git make gcc unzip ripgrep xsel fastfetch bat
+sudo apt install -qq git make gcc unzip ripgrep fastfetch bat $CLIP_MANAGER
 
 # node install for LSPs
 wget -qO- https://raw.githubusercontent.com/nvm-sh/nvm/HEAD/install.sh | bash > /dev/null
