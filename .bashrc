@@ -4,6 +4,11 @@ case $- in
       *) return;;
 esac
 
+# CONTROL FLOW VARS
+if command -v kubectl > /dev/null; then
+    export KUBE_INSTALLED="true"
+fi
+
 
 # SHELL OPTIONS
 # don't put duplicate lines or lines starting with space in the history.
@@ -48,7 +53,10 @@ BLUE="\[\033[01;34m\]"
 YELLOW="\[\e[1;33m\]"
 GREEN="\[\e[1;32m\]"
 
-. ~/.kube-prompt.sh
+
+if [ -n "$KUBE_INSTALLED" ]; then
+    . ~/.kube-prompt.sh
+fi
 . ~/.git-prompt.sh
 GIT_PS1_SHOWCONFLICTSTATE="true"
 GIT_PS1_SHOWCOLORHINTS="true"
@@ -76,9 +84,6 @@ if command -v nvim > /dev/null; then
     export EDITOR=nvim
 else
     export EDITOR=vi
-fi
-if command -v kubectl > /dev/null; then
-    export KUBE_INSTALLED="true"
 fi
 
 # ALIASES
@@ -140,12 +145,12 @@ if ! shopt -oq posix; then
     . /etc/bash_completion
   fi
 fi
-if command -v flux > /dev/null; then
-    . <(flux completion bash)
-fi
-
 if [ -n "$KUBE_INSTALLED" ]; then
     . <(kubectl completion bash)
+    complete -o default -F __start_kubectl k
+    if command -v flux > /dev/null; then
+        . <(flux completion bash)
+    fi
 fi
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
