@@ -5,14 +5,25 @@ set -euo pipefail
 GO_VERSION="1.24.2"
 NODE_VERSION="22"
 
+PACKAGE_LIST="git make gcc unzip ripgrep fastfetch bat"
+
 release_id=$(lsb_release --id | sed 's/Distributor ID\:\t//')
 case "$release_id" in
     *Ubuntu*)
         DISTRO='ubuntu'
+        PKG_MAN='apt'
+        ;;
+    *)
+    *Alpine*)
+        DISTRO='alpine'
+        PKG_MAN='apk'
+        # edit package list to whats available in alpine 3.19 x86 (iSH)
+        PACKAGE_LIST=$(echo $PACKAGE_LIST | sed 's/ fastfetch//')
         ;;
     *)
         echo "unable to detect distro. Assuming debian."
         DISTRO=''
+        PKG_MAN='apt'
         ;;
 esac
 
@@ -26,8 +37,7 @@ if [ -n "$(uname -r | grep WSL)" ]; then
     appendWindowsPath = false
     [network]
     generateResolvConf = false
-EOT
-)
+EOT)
     echo "$wsl_conf" | sudo tee /etc/wsl.conf > /dev/null
 
     if [ -z "$(lsattr /etc/resolv.conf | grep i)" ]; then
@@ -50,8 +60,15 @@ printf "\n\ninstalling packages..\n"
 if [ "$DISTRO" = 'ubuntu' ]; then
         sudo add-apt-repository -y ppa:zhangsongcui3371/fastfetch > /dev/null
 fi
-sudo apt update -qq
-sudo apt install -qq git make gcc unzip ripgrep fastfetch bat $CLIP_MANAGER
+case "$PKG_MAN" in 
+    apt)
+        sudo apt update -qq
+        sudo apt install -qq $PACKAGE_LIST $CLIP_MANAGER
+        ;;
+    apk)
+        sudo apk update
+        sudo apk add -qq $PACKAGE_LIST $CLIP_MANAGER
+        ;;
 
 # node install for LSPs
 wget -qO- https://raw.githubusercontent.com/nvm-sh/nvm/HEAD/install.sh | bash > /dev/null
@@ -74,6 +91,9 @@ if [ -z "$(/usr/local/go/bin/go version) || true | grep $GO_VERSION)" ]; then
     case $arch in
         x86_64)
             GOARCH="amd64"
+            ;;
+        i*86)
+            GOARCH="386"
             ;;
         *)
             echo "error, could not detect arch for go install"
