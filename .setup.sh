@@ -47,11 +47,13 @@ fi
 
 
 printf "\n\ninstalling packages..\n"
+FETCH=""
 if [ "$DISTRO" = 'ubuntu' ]; then
-        sudo add-apt-repository -y ppa:zhangsongcui3371/fastfetch > /dev/null
+    FETCH="fastfetch"
+    sudo add-apt-repository -y ppa:zhangsongcui3371/fastfetch > /dev/null
 fi
 sudo apt update -qq
-sudo apt install -qq git make gcc unzip ripgrep fastfetch bat $CLIP_MANAGER
+sudo apt install -qq git make gcc unzip ripgrep bat $CLIP_MANAGER $FETCH
 
 # node install for LSPs
 wget -qO- https://raw.githubusercontent.com/nvm-sh/nvm/HEAD/install.sh | bash > /dev/null
