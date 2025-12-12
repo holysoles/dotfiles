@@ -40,7 +40,7 @@ EOT
     fi
 fi
 
-CLIPMANAGER="xsel"
+CLIP_MANAGER="xsel"
 if [ "$XDG_SESSION_TYPE" = 'wayland' ]; then
 	CLIP_MANAGER='wl-clipboard'
 fi
