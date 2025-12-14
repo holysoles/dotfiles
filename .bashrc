@@ -75,6 +75,7 @@ if [ -f ~/.bash_env ]; then
     . ~/.bash_env
 fi
 export NVM_DIR="$HOME/.nvm"
+export NODE_EXTRA_CA_CERTS="/etc/ssl/certs/ca-certificates.crt"
 export PATH="$PATH:/usr/local/go/bin"
 export PATH="$PATH:$(go env GOPATH)/bin"
 if [ -d /home/patrick/.platformio/penv/bin ]; then

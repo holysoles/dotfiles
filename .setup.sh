@@ -60,7 +60,7 @@ wget -qO- https://raw.githubusercontent.com/nvm-sh/nvm/HEAD/install.sh | bash > 
 \. "$HOME/.nvm/nvm.sh"
 printf "\n\ninstalling node v${NODE_VERSION} with nvm..\n"
 nvm install $NODE_VERSION
-if [ "$DISTRO" == "ubuntu" ]; then
+if [ "$DISTRO" == "ubuntu" ] || [ "$DISTRO" == "debian" ]; then
 	# use system certificates in case we're on a network with a proxy
 	npm config set cafile /etc/ssl/certs/ca-certificates.crt
 fi
