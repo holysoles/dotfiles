@@ -98,6 +98,7 @@ printf "\n\n"
 read -e -p "Should this machine have write access to GitHub? [y/N]" use_ssh
 
 dotfiles="$HOME/.dotfiles"
+PUBLIC_REPOS=''
 if [ ! -d $dotfiles ]; then
     if [ "$use_ssh" = "y" ]; then
         ssh-keygen -q -t ed25519 -C "holysoles97@gmail.com" -N '' -f $HOME/.ssh/id_ed25519
@@ -111,6 +112,9 @@ if [ ! -d $dotfiles ]; then
         git clone --bare git@github.com:holysoles/dotfiles.git "$dotfiles"
     else
         git clone --bare https://github.com/holysoles/dotfiles.git "$dotfiles"
+
+        # control which submodules we'll checkout
+        PUBLIC_REPOS='.config/nvim'
     fi
 
     # move conflicts to backup folder
@@ -123,8 +127,7 @@ if [ ! -d $dotfiles ]; then
 
     # actually checkout the config
     dot checkout
-
-    dot submodule update --init
+    dot submodule update --init -- $PUBLIC_REPOS
 else
     dot pull
     dot submodule update
