@@ -133,6 +133,7 @@ if [ "$XDG_SESSION_TYPE" = 'wayland' ]; then
 fi
 alias clip=$CLIP
 alias paste=$PASTE
+
 # functions
 function flux-retry-helm() {
   local NAMESPACE="$1"
@@ -141,6 +142,9 @@ function flux-retry-helm() {
   TOKEN="$(date +%s)"
   kubectl annotate helmrelease --field-manager=flux-client-side-apply --overwrite -n "$NAMESPACE" "$HELMRELEASE" \
     "reconcile.fluxcd.io/requestedAt=$TOKEN" "reconcile.fluxcd.io/forceAt=$TOKEN"
+}
+function ssh-hosts() {
+    awk 'tolower($1) == "host" {print $2}' ~/.ssh/config
 }
 
 # TAB COMPLETIONS
