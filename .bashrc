@@ -86,6 +86,11 @@ if command -v nvim > /dev/null; then
 else
     export EDITOR=vi
 fi
+# bitwarden ssh agent
+BW_SNAP="$HOME/snap/bitwarden/current/.bitwarden-ssh-agent.sock"
+if [ -S $BW_SNAP ]; then
+    export SSH_AUTH_SOCK=$BW_SNAP
+fi
 
 # ALIASES
 #if [ -f ~/.bash_aliases ]; then
