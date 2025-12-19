@@ -9,6 +9,10 @@ if command -v kubectl > /dev/null; then
     export KUBE_INSTALLED="true"
 fi
 
+PLATFORM="linux"
+if [ "$(uname)" == "Darwin" ]; then
+  PLATFORM="mac"
+fi
 
 # SHELL OPTIONS
 # don't put duplicate lines or lines starting with space in the history.
@@ -54,16 +58,19 @@ YELLOW="\[\e[1;33m\]"
 GREEN="\[\e[1;32m\]"
 
 
+KUBE_PROMPT=""
 if [ -n "$KUBE_INSTALLED" ]; then
     . ~/.kube-prompt.sh
+    KUBE_PROMPT='$(__kube_ps1)'
 fi
 . ~/.git-prompt.sh
+GIT_PROMPT='$(__git_ps1 "(%s)")'
 GIT_PS1_SHOWCONFLICTSTATE="true"
 GIT_PS1_SHOWCOLORHINTS="true"
 GIT_PS1_SHOWDIRTYSTATE="true"
 GIT_PS1_SHOWUNTRACKEDFILES="true"
 GIT_PS1_SHOWUPSTREAM="true"
-PROMPT_COMMAND='KUBE_STATUS=$(__kube_ps1); GIT_STATUS=$(__git_ps1 "(%s)")'
+PROMPT_COMMAND="KUBE_STATUS=$KUBE_PROMPT; GIT_STATUS=$GIT_PROMPT"
 PS1='${KUBE_STATUS}${GIT_STATUS} \[\e[94m\]\W\[\e[0m\]> '
 
 
@@ -80,6 +87,9 @@ export PATH="$PATH:/usr/local/go/bin"
 export PATH="$PATH:$(go env GOPATH)/bin"
 if [ -d /home/patrick/.platformio/penv/bin ]; then
     export PATH="$PATH:$HOME/.platformio/penv/bin/"
+fi
+if [ "$PLATFORM" = "mac" ]; then
+    export PATH="/opt/homebrew/bin:$PATH"
 fi
 if command -v nvim > /dev/null; then
     export EDITOR=nvim
@@ -124,7 +134,11 @@ alias k='kubectl'
 alias ksw='kubectl config use-context'
 alias watchh='watch '
 alias flushdns='sudo resolvectl flush-caches'
-alias cat='batcat'
+if command -v bat; then
+    alias cat='bat'
+elif command -v batcat; then
+    alias cat='batcat'
+fi
 CLIP=xsel
 PASTE=xsel
 if [ "$XDG_SESSION_TYPE" = 'wayland' ]; then
