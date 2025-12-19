@@ -98,7 +98,10 @@ else
 fi
 # bitwarden ssh agent
 BW_SNAP="$HOME/snap/bitwarden/current/.bitwarden-ssh-agent.sock"
-if [ -S $BW_SNAP ]; then
+BW_HOME="$HOME/.bitwarden-ssh-agent.sock"
+if [ -S $BW_HOME ]; then
+    export SSH_AUTH_SOCK=$BW_HOME
+elif [ -S $BW_SNAP ]; then
     export SSH_AUTH_SOCK=$BW_SNAP
 fi
 
