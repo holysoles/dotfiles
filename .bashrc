@@ -134,9 +134,9 @@ alias k='kubectl'
 alias ksw='kubectl config use-context'
 alias watchh='watch '
 alias flushdns='sudo resolvectl flush-caches'
-if command -v bat; then
+if command -v bat > /dev/null; then
     alias cat='bat'
-elif command -v batcat; then
+elif command -v batcat > /dev/null; then
     alias cat='batcat'
 fi
 CLIP=xsel
