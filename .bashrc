@@ -58,11 +58,8 @@ YELLOW="\[\e[1;33m\]"
 GREEN="\[\e[1;32m\]"
 
 
-KUBE_PROMPT=""
-if [ -n "$KUBE_INSTALLED" ]; then
-    . ~/.kube-prompt.sh
-    KUBE_PROMPT='$(__kube_ps1)'
-fi
+. ~/.kube-prompt.sh
+KUBE_PROMPT='$(__kube_ps1)'
 . ~/.git-prompt.sh
 GIT_PROMPT='$(__git_ps1 "(%s)")'
 GIT_PS1_SHOWCONFLICTSTATE="true"
