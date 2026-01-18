@@ -149,6 +149,9 @@ alias clip=$CLIP
 alias paste=$PASTE
 
 # functions
+function mkcd() {
+  mkdir -p "$1" && cd "$1"
+}
 function flux-retry-helm() {
   local NAMESPACE="$1"
   local HELMRELEASE="$2"
