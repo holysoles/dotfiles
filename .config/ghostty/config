@@ -46,3 +46,6 @@ background-opacity = 0.95
 
 # modify sudo env to have term info for ghostty
 shell-integration-features = sudo
+
+# don't warn on multiline paste
+clipboard-paste-protection = false
