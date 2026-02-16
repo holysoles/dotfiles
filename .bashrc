@@ -78,12 +78,16 @@ fi
 if [ -f ~/.bash_env ]; then
     . ~/.bash_env
 fi
+
 export NVM_DIR="$HOME/.nvm"
 export NODE_EXTRA_CA_CERTS="/etc/ssl/certs/ca-certificates.crt"
 export PATH="$PATH:/usr/local/go/bin"
 export PATH="$PATH:$(go env GOPATH)/bin"
 if [ -d /home/patrick/.platformio/penv/bin ]; then
     export PATH="$PATH:$HOME/.platformio/penv/bin/"
+fi
+if [-f ~/.deno/env ]; then
+    . ~/.deno/env
 fi
 if [ "$PLATFORM" = "mac" ]; then
     export PATH="/opt/homebrew/bin:$PATH"
@@ -189,4 +193,3 @@ if [ -n "$(which fastfetch)" ]; then
     #sleep 0.1 # sleep since fastfetch fails to retrieve screen size initially on asahi
     fastfetch
 fi
-
