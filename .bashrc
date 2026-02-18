@@ -86,7 +86,7 @@ export PATH="$PATH:$(go env GOPATH)/bin"
 if [ -d /home/patrick/.platformio/penv/bin ]; then
     export PATH="$PATH:$HOME/.platformio/penv/bin/"
 fi
-if [-f ~/.deno/env ]; then
+if [ -f ~/.deno/env ]; then
     . ~/.deno/env
 fi
 if [ "$PLATFORM" = "mac" ]; then
