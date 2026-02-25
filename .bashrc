@@ -83,8 +83,11 @@ export NVM_DIR="$HOME/.nvm"
 export NODE_EXTRA_CA_CERTS="/etc/ssl/certs/ca-certificates.crt"
 export PATH="$PATH:/usr/local/go/bin"
 export PATH="$PATH:$(go env GOPATH)/bin"
-if [ -d /home/patrick/.platformio/penv/bin ]; then
+if [ -d "$HOME/.platformio/penv/bin" ]; then
     export PATH="$PATH:$HOME/.platformio/penv/bin/"
+fi
+if [ -d "$HOME/.cargo/bin" ]; then
+    export PATH="$PATH:$HOME/.cargo/bin/"
 fi
 if [ -f ~/.deno/env ]; then
     . ~/.deno/env
