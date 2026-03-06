@@ -5,10 +5,17 @@ set -euo pipefail
 GO_VERSION="1.24.2"
 NODE_VERSION="22"
 
-release_id=$(lsb_release --id | sed 's/Distributor ID\:\t//')
+if command -v lsb_release > /dev/null; then
+    release_id=$(lsb_release --id | sed 's/Distributor ID\:\t//')
+else
+    release_id=$(cat /etc/os-release | grep '^ID=' | sed 's/ID=//')
+fi
 case "$release_id" in
     *Ubuntu*)
         DISTRO='ubuntu'
+        ;;
+    *fedora*)
+        DISTRO='fedora'
         ;;
     *)
         echo "unable to detect distro. Assuming debian."
@@ -48,12 +55,15 @@ fi
 
 printf "\n\ninstalling packages..\n"
 FETCH=""
+PKG_MAN="apt"
 if [ "$DISTRO" = 'ubuntu' ]; then
     FETCH="fastfetch"
     sudo add-apt-repository -y ppa:zhangsongcui3371/fastfetch > /dev/null
+elif [ "$DISTRO" = 'fedora' ]; then
+    PKG_MAN="dnf"
 fi
-sudo apt update -qq
-sudo apt install -qq git make gcc unzip ripgrep bat $CLIP_MANAGER $FETCH
+sudo $PKG_MAN update -qq
+sudo $PKG_MAN install -qq git make gcc unzip ripgrep bat $CLIP_MANAGER $FETCH
 
 # node install for LSPs
 wget -qO- https://raw.githubusercontent.com/nvm-sh/nvm/HEAD/install.sh | bash > /dev/null
