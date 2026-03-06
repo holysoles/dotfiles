@@ -191,7 +191,7 @@ fi
 
 
 # CMDS
-if [ -n "$(which fastfetch)" ]; then
+if command -v fastfetch > /dev/null; then
     # TODO filter on asahi (kernel name?)
     #sleep 0.1 # sleep since fastfetch fails to retrieve screen size initially on asahi
     fastfetch

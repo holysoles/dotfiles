@@ -56,14 +56,17 @@ fi
 printf "\n\ninstalling packages..\n"
 FETCH=""
 PKG_MAN="apt"
+PKG_MAN_FLAGS="-qq"
 if [ "$DISTRO" = 'ubuntu' ]; then
     FETCH="fastfetch"
     sudo add-apt-repository -y ppa:zhangsongcui3371/fastfetch > /dev/null
 elif [ "$DISTRO" = 'fedora' ]; then
     PKG_MAN="dnf"
+    PKG_MAN_FLAGS="$PKG_MAN_FLAGS -y"
+    FETCH="fastfetch"
 fi
-sudo $PKG_MAN update -qq
-sudo $PKG_MAN install -qq git make gcc unzip ripgrep bat $CLIP_MANAGER $FETCH
+sudo $PKG_MAN update $PKG_MAN_FLAGS
+sudo $PKG_MAN install $PKG_MAN_FLAGS git make gcc unzip ripgrep bat $CLIP_MANAGER $FETCH
 
 # node install for LSPs
 wget -qO- https://raw.githubusercontent.com/nvm-sh/nvm/HEAD/install.sh | bash > /dev/null
@@ -79,7 +82,8 @@ npm install -g pin-github-action
 
 
 # golang install
-if [ -z "$(/usr/local/go/bin/go version) || true | grep $GO_VERSION)" ]; then
+GO_PATH="/usr/local/go/bin/go"
+if ! command -v $GO_PATH > /dev/null || [ "$($GO_PATH version)" != *"$GO_VERSION"* ]; then
     printf "\n\ninstalling Go..\n"
     GOARCH=""
     arch=$(arch)
