@@ -83,7 +83,7 @@ npm install -g pin-github-action
 
 # golang install
 GO_PATH="/usr/local/go/bin/go"
-if ! command -v $GO_PATH > /dev/null || [ "$($GO_PATH version)" != *"$GO_VERSION"* ]; then
+if ! command -v $GO_PATH > /dev/null 2>&1 || [ "$($GO_PATH version)" != *"$GO_VERSION"* ]; then
     printf "\n\ninstalling Go..\n"
     GOARCH=""
     arch=$(arch)
