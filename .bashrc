@@ -101,10 +101,13 @@ else
     export EDITOR=vi
 fi
 # bitwarden ssh agent
+BW_FLAT="$HOME/.var/app/com.bitwarden.desktop/data/.bitwarden-ssh-agent.sock"
 BW_SNAP="$HOME/snap/bitwarden/current/.bitwarden-ssh-agent.sock"
 BW_HOME="$HOME/.bitwarden-ssh-agent.sock"
 if [ -S $BW_HOME ]; then
     export SSH_AUTH_SOCK=$BW_HOME
+elif [ -S $BW_FLAT ]; then
+    export SSH_AUTH_SOCK=$BW_FLAT
 elif [ -S $BW_SNAP ]; then
     export SSH_AUTH_SOCK=$BW_SNAP
 fi
