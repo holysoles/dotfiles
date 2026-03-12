@@ -91,6 +91,9 @@ if ! command -v $GO_PATH > /dev/null 2>&1 || [ "$($GO_PATH version)" != *"$GO_VE
         x86_64)
             GOARCH="amd64"
             ;;
+        aarch64)
+            GOARCH="arm64"
+            ;;
         *)
             echo "error, could not detect arch for go install"
             exit 1
