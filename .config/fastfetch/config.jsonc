@@ -2,14 +2,18 @@
     "$schema": "https://github.com/fastfetch-cli/fastfetch/raw/dev/doc/json_schema.json",
     "display": {
         "size": {
-            "maxPrefix": "MB",
-            "ndigits": 0
+            "maxPrefix": "GB",
+            "ndigits": 2,
+            "binaryPrefix": "jedec",
         }
     },
     "modules": [
         "title",
         "separator",
-        "os",
+        {
+            "type": "os",
+            "format": "{name} (version-id)",
+        },
         "host",
         {
             "type": "kernel",
@@ -37,8 +41,15 @@
             "type": "memory",
             "format": "{} / {}"
         },
-	"battery",
-	"disk",
+        {
+            "type": "battery",
+            "key": "Battery",
+            "format": "{capacity} - {time-hours}:{time-minutes} remaining",
+        },
+        {
+            "type": "disk",
+            "format": "{size-percentage}: {size-used}/{size-total} used",
+        },
   	{
             "type": "localip",
             "showIpv6": false,
