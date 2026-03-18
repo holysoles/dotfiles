@@ -60,12 +60,12 @@ PKG_MAN_FLAGS="-qq"
 if [ "$DISTRO" = 'ubuntu' ]; then
     FETCH="fastfetch"
     sudo add-apt-repository -y ppa:zhangsongcui3371/fastfetch > /dev/null
+    sudo $PKG_MAN update $PKG_MAN_FLAGS
 elif [ "$DISTRO" = 'fedora' ]; then
     PKG_MAN="dnf"
     PKG_MAN_FLAGS="$PKG_MAN_FLAGS -y"
     FETCH="fastfetch"
 fi
-sudo $PKG_MAN update $PKG_MAN_FLAGS
 sudo $PKG_MAN install $PKG_MAN_FLAGS git make gcc unzip ripgrep bat $CLIP_MANAGER $FETCH
 
 # node install for LSPs
