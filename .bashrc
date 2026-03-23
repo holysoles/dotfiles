@@ -81,6 +81,7 @@ fi
 
 export NVM_DIR="$HOME/.nvm"
 export NODE_EXTRA_CA_CERTS="/etc/ssl/certs/ca-certificates.crt"
+export PATH="$HOME/.local/bin:$PATH"
 export PATH="$PATH:/usr/local/go/bin"
 export PATH="$PATH:$(go env GOPATH)/bin"
 if [ -d "$HOME/.platformio/penv/bin" ]; then
