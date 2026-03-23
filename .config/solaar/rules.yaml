@@ -1,0 +1,19 @@
+%YAML 1.3
+---
+- MouseGesture: Mouse Up
+- KeyPress:
+  - [Control_L, x]
+  - click
+...
+---
+- MouseGesture: Mouse Left
+- KeyPress:
+  - Delete
+  - click
+...
+---
+- MouseGesture: Mouse Down
+- KeyPress:
+  - [Control_L, v]
+  - click
+...
