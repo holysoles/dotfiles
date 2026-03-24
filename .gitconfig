@@ -6,6 +6,8 @@
 	gpgsign = true
 [gpg]
 	format = ssh
+[include]
+	path = ~/.gitconfig.work
 [push]
 	autoSetupRemote = true
 [pull]
