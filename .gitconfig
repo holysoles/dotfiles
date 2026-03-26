@@ -6,8 +6,10 @@
 	gpgsign = true
 [gpg]
 	format = ssh
+[gpg "ssh"]
+	allowedSignersFile = ~/.ssh/allowed_signers
 [include]
-	path = ~/.gitconfig.work
+	path = .gitconfig.work
 [push]
 	autoSetupRemote = true
 [pull]
