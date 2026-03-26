@@ -1,6 +1,6 @@
 [user]
 	name = Patrick Evans
-	email = holysoles97@gmail.com
+	email = pat@pve.dev
 	signingkey = ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIN0Jtdt0hDYEYVTiWjsue0PxcWWhzUQEwjVQBAqsd8rT
 [commit]
 	gpgsign = true
