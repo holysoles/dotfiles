@@ -5,10 +5,6 @@ case $- in
 esac
 
 # CONTROL FLOW VARS
-if command -v kubectl > /dev/null; then
-    export KUBE_INSTALLED="true"
-fi
-
 PLATFORM="linux"
 if [ "$(uname)" == "Darwin" ]; then
   PLATFORM="mac"
@@ -30,47 +26,6 @@ shopt -s globstar
 # make less more friendly for non-text input files, see lesspipe(1)
 [ -x /usr/bin/lesspipe ] && eval "$(SHELL=/bin/sh lesspipe)"
 
-
-# PROMPT
-# set variable identifying the chroot you work in (used in the prompt below)
-if [ -z "${debian_chroot:-}" ] && [ -r /etc/debian_chroot ]; then
-    debian_chroot=$(cat /etc/debian_chroot)
-fi
-# color detection
-if [ -x /usr/bin/tput ] && tput setaf 1 >&/dev/null; then
-    # We have color support; assume it's compliant with Ecma-48
-    # (ISO/IEC-6429). (Lack of such support is extremely rare, and such
-    # a case would tend to support setf rather than setaf.)
-    color_prompt=yes
-else
-    color_prompt=
-fi
-
-if [ "$color_prompt" = yes ]; then
-    PS1='${debian_chroot:+($debian_chroot)}\[\033[01;32m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\$ '
-else
-    PS1='${debian_chroot:+($debian_chroot)}\u@\h:\w\$ '
-fi
-unset color_prompt
-NORMAL="\[\033[00m\]"
-BLUE="\[\033[01;34m\]"
-YELLOW="\[\e[1;33m\]"
-GREEN="\[\e[1;32m\]"
-
-
-. ~/.kube-prompt.sh
-KUBE_PROMPT='$(__kube_ps1)'
-. ~/.git-prompt.sh
-GIT_PROMPT='$(__git_ps1 "(%s)")'
-GIT_PS1_SHOWCONFLICTSTATE="true"
-GIT_PS1_SHOWCOLORHINTS="true"
-GIT_PS1_SHOWDIRTYSTATE="true"
-GIT_PS1_SHOWUNTRACKEDFILES="true"
-GIT_PS1_SHOWUPSTREAM="true"
-PROMPT_COMMAND="KUBE_STATUS=$KUBE_PROMPT; GIT_STATUS=$GIT_PROMPT"
-PS1='${KUBE_STATUS}${GIT_STATUS} \[\e[94m\]\W\[\e[0m\]> '
-
-
 # ENV
 if [ -f ~/.local/bin/env ]; then
     . ~/.local/bin/env
@@ -78,7 +33,6 @@ fi
 if [ -f ~/.bash_env ]; then
     . ~/.bash_env
 fi
-
 export NVM_DIR="$HOME/.nvm"
 export NODE_EXTRA_CA_CERTS="/etc/ssl/certs/ca-certificates.crt"
 export PATH="$HOME/.local/bin:$PATH"
@@ -100,6 +54,9 @@ if command -v nvim > /dev/null; then
     export EDITOR=nvim
 else
     export EDITOR=vi
+fi
+if [ "$USER" == "paevans" ]; then
+    export WORK="true"
 fi
 # bitwarden ssh agent
 BW_FLAT="$HOME/.var/app/com.bitwarden.desktop/data/.bitwarden-ssh-agent.sock"
@@ -174,6 +131,16 @@ function flux-retry-helm() {
 function ssh-hosts() {
     awk 'tolower($1) == "host" {print $2}' ~/.ssh/config
 }
+if [ "$WORK" == "true" ]; then
+    function cluster_function() {
+        info="$(ocm backplane status 2> /dev/null)"
+        if [ $? -ne 0 ]; then return; fi
+        clustername=$(grep "Cluster Name" <<< $info | awk '{print $3}')
+        baseid=$(grep "Cluster Basedomain" <<< $info | awk '{print $3}' | cut -d'.' -f1,2)
+        echo $clustername.$baseid
+    }
+    export KUBE_PS1_CLUSTER_FUNCTION=cluster_function
+fi
 
 # TAB COMPLETIONS
 if ! shopt -oq posix; then
@@ -183,19 +150,67 @@ if ! shopt -oq posix; then
     . /etc/bash_completion
   fi
 fi
-if [ -n "$KUBE_INSTALLED" ]; then
+if command -v kubectl > /dev/null; then
+    export KUBE_INSTALLED="kubectl"
     . <(kubectl completion bash)
     complete -o default -F __start_kubectl k
-    if command -v flux > /dev/null; then
-        . <(flux completion bash)
-    fi
 fi
-if command -v aws_completer > /dev/null; then
-    complete -C aws_completer aws
+if [ "$WORK" == "true" ]; then
+    if command -v oc > /dev/null; then
+        # override kubectl
+        export KUBE_INSTALLED="oc"
+        KUBE_PS1_SYMBOL_CUSTOM="oc"
+    fi
+    if command -v aws_completer > /dev/null; then
+        complete -C aws_completer aws
+    fi
+else
+    if command -v flux > /dev/null; then
+            . <(flux completion bash)
+    fi
 fi
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
 
+
+# PROMPT
+# set variable identifying the chroot you work in (used in the prompt below)
+if [ -z "${debian_chroot:-}" ] && [ -r /etc/debian_chroot ]; then
+    debian_chroot=$(cat /etc/debian_chroot)
+fi
+# color detection
+if [ -x /usr/bin/tput ] && tput setaf 1 >&/dev/null; then
+    # We have color support; assume it's compliant with Ecma-48
+    # (ISO/IEC-6429). (Lack of such support is extremely rare, and such
+    # a case would tend to support setf rather than setaf.)
+    color_prompt=yes
+else
+    color_prompt=
+fi
+
+if [ "$color_prompt" = yes ]; then
+    PS1='${debian_chroot:+($debian_chroot)}\[\033[01;32m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\$ '
+else
+    PS1='${debian_chroot:+($debian_chroot)}\u@\h:\w\$ '
+fi
+unset color_prompt
+NORMAL="\[\033[00m\]"
+BLUE="\[\033[01;34m\]"
+YELLOW="\[\e[1;33m\]"
+GREEN="\[\e[1;32m\]"
+
+. ~/.local/bin/kube-ps1.sh
+KUBE_PS1_BINARY="$KUBE_INSTALLED"
+KUBE_PROMPT='\[\e[38;5;39m\]$(kube_ps1)\[\e[0m\]'
+
+. ~/.git-prompt.sh
+GIT_PS1_SHOWCONFLICTSTATE="true"
+GIT_PS1_SHOWCOLORHINTS="true"
+GIT_PS1_SHOWDIRTYSTATE="true"
+GIT_PS1_SHOWUNTRACKEDFILES="true"
+GIT_PS1_SHOWUPSTREAM="true"
+GIT_PROMPT='$(__git_ps1 "[%s]")'
+PS1=$KUBE_PROMPT$GIT_PROMPT' \[\e[94m\]\W\[\e[0m\]> '
 
 # CMDS
 if command -v fastfetch > /dev/null; then
