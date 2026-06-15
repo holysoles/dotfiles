@@ -2,7 +2,7 @@
 
 set -euo pipefail
 
-GO_VERSION="1.24.2"
+GO_VERSION="1.26.4"
 NODE_VERSION="22"
 
 if command -v lsb_release > /dev/null; then
@@ -66,7 +66,7 @@ elif [ "$DISTRO" = 'fedora' ]; then
     PKG_MAN_FLAGS="$PKG_MAN_FLAGS -y"
     FETCH="fastfetch"
 fi
-sudo $PKG_MAN install $PKG_MAN_FLAGS git make gcc unzip ripgrep bat $CLIP_MANAGER $FETCH
+sudo $PKG_MAN install $PKG_MAN_FLAGS git make gcc unzip ripgrep bat fzf $CLIP_MANAGER $FETCH
 
 # node install for LSPs
 wget -qO- https://raw.githubusercontent.com/nvm-sh/nvm/HEAD/install.sh | bash > /dev/null
