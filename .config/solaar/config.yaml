@@ -5,6 +5,7 @@
     rgb_zone_, brightness_control, per-key-lighting, fn-swap, persistent-remappable-keys, disable-keyboard-keys, crown-smooth, divert-crown, divert-gkeys,
     m-key-leds, mr-key-led, multiplatform, gesture2-gestures, gesture2-divert, gesture2-params, sidetone, equalizer, adc_power_management]
   _battery: 4100
+  _dpi-sliding: 20
   _modelId: B04200000000
   _sensitive: {divert-keys: true, hires-smooth-resolution: false}
   _serial: 94604CCD
@@ -12,7 +13,7 @@
   _wpid: B042
   change-host: null
   divert-keys: {82: 0, 83: 0, 86: 0, 195: 0, 196: 3, 416: 2}
-  dpi: 1050
+  dpi: 1200
   force-sensing: {0: 4559}
   haptic-level: 60
   haptic-play: null
@@ -25,3 +26,9 @@
   smart-shift: 10
   thumb-scroll-invert: false
   thumb-scroll-mode: false
+- _NAME: Marathon Mouse M705 (M-R0009)
+  _sensitive: {hires-scroll-mode: ignore, hires-smooth-invert: ignore, hires-smooth-resolution: ignore}
+  _serial: D0C6DD84
+  _wpid: 101B
+  side-scroll: true
+  smooth-scroll: true
