@@ -151,6 +151,7 @@ if ! shopt -oq posix; then
     . /etc/bash_completion
   fi
 fi
+eval "$(fzf --bash)"
 if command -v kubectl > /dev/null; then
     export KUBE_INSTALLED="kubectl"
     . <(kubectl completion bash)
@@ -161,6 +162,7 @@ if [ "$WORK" == "true" ]; then
         # override kubectl
         export KUBE_INSTALLED="oc"
         KUBE_PS1_SYMBOL_CUSTOM="oc"
+        . <(oc completion bash)
     fi
     if command -v aws_completer > /dev/null; then
         complete -C aws_completer aws
@@ -172,6 +174,20 @@ else
 fi
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+_kube_contexts()
+{
+  local curr_arg;
+  curr_arg=${COMP_WORDS[COMP_CWORD]}
+  COMPREPLY=( $(compgen -W "- $(kubectl config get-contexts --output='name')" -- $curr_arg ) );
+}
+complete -o default -F _kube_contexts kubectx kctx
+_kube_namespaces()
+{
+  local curr_arg;
+  curr_arg=${COMP_WORDS[COMP_CWORD]}
+  COMPREPLY=( $(compgen -W "- $(kubectl get namespaces -o=jsonpath='{range .items[*].metadata.name}{@}{"\n"}{end}')" -- $curr_arg ) );
+}
+complete -o default -F _kube_namespaces kubens kns
 
 
 # PROMPT
