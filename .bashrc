@@ -151,44 +151,88 @@ if ! shopt -oq posix; then
     . /etc/bash_completion
   fi
 fi
-eval "$(fzf --bash)"
+fzf() {
+    unset -f fzf
+    command fzf "$@"
+    local ret=$?
+        if [[ -z $FZF_COMPLETE ]]; then
+            eval "$(fzf --bash)"
+            export FZF_COMPLETE=1
+        fi
+    return $ret
+}
 if command -v kubectl > /dev/null; then
     export KUBE_INSTALLED="kubectl"
-    . <(kubectl completion bash)
-    complete -o default -F __start_kubectl k
+
+    # lazy load kubectl completions
+    kubectl() {
+        unset -f kubectl
+        command kubectl "$@"
+        local ret=$?
+        if [[ -z $KUBECTL_COMPLETE ]]; then
+            . <(command kubectl completion bash)
+            complete -o default -F __start_kubectl k
+            export KUBECTL_COMPLETE=1
+        fi
+        return $ret
+    }
+
+    # cant lazy load these since needed for prompt
+    _kube_contexts() {
+      local curr_arg;
+      curr_arg=${COMP_WORDS[COMP_CWORD]}
+      COMPREPLY=( $(compgen -W "- $(kubectl config get-contexts --output='name')" -- $curr_arg ) );
+    }
+    complete -o default -F _kube_contexts kubectx kctx
+    _kube_namespaces() {
+      local curr_arg;
+      curr_arg=${COMP_WORDS[COMP_CWORD]}
+      COMPREPLY=( $(compgen -W "- $(kubectl get namespaces -o=jsonpath='{range .items[*].metadata.name}{@}{"\n"}{end}')" -- $curr_arg ) );
+    }
+    complete -o default -F _kube_namespaces kubens kns
 fi
+
 if [ "$WORK" == "true" ]; then
     if command -v oc > /dev/null; then
         # override kubectl
         export KUBE_INSTALLED="oc"
         KUBE_PS1_SYMBOL_CUSTOM="oc"
-        . <(oc completion bash)
+        # lazy load oc completions
+        oc() {
+            unset -f oc
+            command oc "$@"
+            local ret=$?
+            if [[ -z $OC_COMPLETE ]]; then
+                . <(oc completion bash)
+                export OC_COMPLETE=1
+            fi
+            return $ret
+        }
     fi
     if command -v aws_completer > /dev/null; then
         complete -C aws_completer aws
     fi
 else
     if command -v flux > /dev/null; then
-            . <(flux completion bash)
+        # lazy load flux completions
+        flux() {
+            unset -f flux
+            command flux "$@"
+            local ret=$?
+            if [[ -z $FLUX_COMPLETE ]]; then
+                . <(flux completion bash)
+                export FLUX_COMPLETE=1
+            fi
+        }
     fi
 fi
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
-[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
-_kube_contexts()
-{
-  local curr_arg;
-  curr_arg=${COMP_WORDS[COMP_CWORD]}
-  COMPREPLY=( $(compgen -W "- $(kubectl config get-contexts --output='name')" -- $curr_arg ) );
+# lazy load nvm completions
+nvm() {
+    unset -f nvm
+    [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+    [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+    nvm "$@"
 }
-complete -o default -F _kube_contexts kubectx kctx
-_kube_namespaces()
-{
-  local curr_arg;
-  curr_arg=${COMP_WORDS[COMP_CWORD]}
-  COMPREPLY=( $(compgen -W "- $(kubectl get namespaces -o=jsonpath='{range .items[*].metadata.name}{@}{"\n"}{end}')" -- $curr_arg ) );
-}
-complete -o default -F _kube_namespaces kubens kns
-
 
 # PROMPT
 # set variable identifying the chroot you work in (used in the prompt below)
