@@ -121,6 +121,9 @@ alias paste=$PASTE
 function mkcd() {
   mkdir -p "$1" && cd "$1"
 }
+function find-dupes() {
+    find . ! -empty -type f -exec md5sum {} + | sort | uniq -w32 -dD
+}
 function flux-retry-helm() {
   local NAMESPACE="$1"
   local HELMRELEASE="$2"
