@@ -211,6 +211,17 @@ if [ "$WORK" == "true" ]; then
             fi
             return $ret
         }
+        # lazy load oc completions
+        osdctl() {
+            unset -f osdctl
+            command osdctl "$@"
+            local ret=$?
+            if [[ -z $OSDCTL_COMPLETE ]]; then
+                . <(osdctl completion bash)
+                export OSDCTL_COMPLETE=1
+            fi
+            return $ret
+        }
     fi
     if command -v aws_completer > /dev/null; then
         complete -C aws_completer aws
