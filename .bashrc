@@ -108,6 +108,9 @@ if command -v bat > /dev/null; then
 elif command -v batcat > /dev/null; then
     alias cat='batcat'
 fi
+if [ "$WORK" == "true" ]; then
+    alias occ='osdctl cluster context -C'
+fi
 CLIP=xsel
 PASTE=xsel
 if [ "$XDG_SESSION_TYPE" = 'wayland' ]; then
@@ -219,6 +222,16 @@ if [ "$WORK" == "true" ]; then
             if [[ -z $OSDCTL_COMPLETE ]]; then
                 . <(osdctl completion bash)
                 export OSDCTL_COMPLETE=1
+            fi
+            return $ret
+        }
+        rosa(){
+            unset -f rosa
+            command rosa "$@"
+            local ret=$?
+            if [[ -z $ROSA_COMPLETE ]]; then
+                . <(rosa completion bash)
+                export ROSA_COMPELTE=1
             fi
             return $ret
         }

@@ -2,7 +2,7 @@
 
 set -euo pipefail
 
-GO_VERSION="1.26.4"
+GO_VERSION="1.26.5"
 NODE_VERSION="22"
 
 if command -v lsb_release > /dev/null; then
