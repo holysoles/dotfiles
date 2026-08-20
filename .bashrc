@@ -47,6 +47,9 @@ fi
 if [ -f ~/.deno/env ]; then
     . ~/.deno/env
 fi
+if [ -f "$HOME/.cargo/env" ]; then
+    . "$HOME/.cargo/env"
+fi
 if [ "$PLATFORM" = "mac" ]; then
     export PATH="/opt/homebrew/bin:$PATH"
 fi
@@ -103,6 +106,7 @@ alias k='kubectl'
 alias ksw='kubectl config use-context'
 alias watchh='watch '
 alias flushdns='sudo resolvectl flush-caches'
+alias import-ovpn='nmcli connection import type openvpn file'
 if command -v bat > /dev/null; then
     alias cat='bat'
 elif command -v batcat > /dev/null; then
@@ -147,6 +151,10 @@ if [ "$WORK" == "true" ]; then
         echo $clustername.$baseid
     }
     export KUBE_PS1_CLUSTER_FUNCTION=cluster_function
+
+    function ocml(){
+        ocm login --use-auth-code --url=$1
+    }
 fi
 
 # TAB COMPLETIONS
