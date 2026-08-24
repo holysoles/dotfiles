@@ -9,5 +9,8 @@
     "npm:@dietrichgebert/ponytail",
     "npm:pi-mcp-adapter",
     "npm:pi-subagents"
+  ],
+  "extensions": [
+    "extensions/rtk"
   ]
 }
