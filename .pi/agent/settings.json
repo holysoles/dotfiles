@@ -1,0 +1,13 @@
+{
+  "lastChangelogVersion": "0.84.2",
+  "theme": "dark",
+  "defaultProvider": "anthropic",
+  "defaultModel": "claude-sonnet-5",
+  "defaultThinkingLevel": "medium",
+  "packages": [
+    "npm:@plannotator/pi-extension",
+    "npm:@dietrichgebert/ponytail",
+    "npm:pi-mcp-adapter",
+    "npm:pi-subagents"
+  ]
+}
