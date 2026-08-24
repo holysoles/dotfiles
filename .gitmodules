@@ -4,10 +4,9 @@
 [submodule ".ssh"]
 	path = .ssh
 	url = git@github.com:holysoles/ssh-config.git
-[submodule ".pi/extensions/.rtk"]
-	path = .pi/extensions/.rtk
-	url = https://github.com/rtk-ai/rtk.git
-	branch = develop
 [submodule ".pi/agent/extensions/.rtk"]
 	path = .pi/agent/extensions/.rtk
 	url = https://github.com/rtk-ai/rtk.git
+[submodule ".pi/agent/extensions/.mitsuhiko"]
+	path = .pi/agent/extensions/.mitsuhiko
+	url = https://github.com/mitsuhiko/agent-stuff.git
