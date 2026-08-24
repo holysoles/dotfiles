@@ -1,5 +1,5 @@
 {
-  "lastChangelogVersion": "0.84.2",
+  "lastChangelogVersion": "0.84.3",
   "theme": "dark",
   "defaultProvider": "anthropic",
   "defaultModel": "claude-sonnet-5",
@@ -8,7 +8,8 @@
     "npm:@plannotator/pi-extension",
     "npm:@dietrichgebert/ponytail",
     "npm:pi-mcp-adapter",
-    "npm:pi-subagents"
+    "npm:pi-subagents",
+    "npm:@twogiants/pi-anthropic-vertex"
   ],
   "extensions": [
     "extensions/rtk"
