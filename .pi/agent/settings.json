@@ -10,15 +10,20 @@
     "npm:pi-mcp-adapter",
     "npm:pi-subagents",
     "npm:@twogiants/pi-anthropic-vertex",
-    "npm:@gotgenes/pi-permission-system"
+    "npm:@gotgenes/pi-permission-system",
+    "npm:pi-lens"
   ],
   "enabledModels": [
     "anthropic-vertex/claude-opus-4-6",
     "anthropic-vertex/claude-sonnet-4-6",
     "anthropic-vertex/claude-haiku-4-5"
   ],
-  "projectPrompts": [".claude/commands"],
-  "projectSkills": [".claude/skills"],
+  "projectPrompts": [
+    ".claude/commands"
+  ],
+  "projectSkills": [
+    ".claude/skills"
+  ],
   "env": {
     "GIT_EDITOR": "true"
   },
