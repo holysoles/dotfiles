@@ -9,7 +9,8 @@
     "npm:@dietrichgebert/ponytail",
     "npm:pi-mcp-adapter",
     "npm:pi-subagents",
-    "npm:@twogiants/pi-anthropic-vertex"
+    "npm:@twogiants/pi-anthropic-vertex",
+    "npm:@gotgenes/pi-permission-system"
   ],
   "extensions": [
     "extensions/rtk"
