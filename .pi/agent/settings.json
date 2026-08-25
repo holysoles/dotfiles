@@ -1,8 +1,8 @@
 {
   "lastChangelogVersion": "0.84.3",
   "theme": "dark",
-  "defaultProvider": "anthropic",
-  "defaultModel": "claude-sonnet-5",
+  "defaultProvider": "anthropic-vertex",
+  "defaultModel": "claude-sonnet-4-6",
   "defaultThinkingLevel": "medium",
   "packages": [
     "npm:@plannotator/pi-extension",
@@ -17,6 +17,8 @@
     "anthropic-vertex/claude-sonnet-4-6",
     "anthropic-vertex/claude-haiku-4-5"
   ],
+  "projectPrompts": [".claude/commands"],
+  "projectSkills": [".claude/skills"],
   "env": {
     "GIT_EDITOR": "true"
   },
