@@ -1,0 +1,49 @@
+{
+  "permission": {
+    "*": "allow",
+    "path": {
+      "*": "allow",
+      "*.env": "deny",
+      "*.env.*": "deny",
+      "*.env.example": "allow"
+    },
+    "bash": {
+      "*": "ask",
+      "rm -rf *": "deny",
+      "sudo *": "ask",
+      "cd *": "allow",
+      "echo *": "allow",
+      "find *": "allow",
+      "for *": "allow",
+      "ls *": "allow",
+      "grep *": "allow",
+      "tail *": "allow",
+      "head *": "allow",
+      "cat *": "allow",
+      "jq *": "allow",
+      "sed *": "allow",
+      "sed -i *": "ask",
+      "kubectl *": "ask",
+      "kubectl get *": "allow",
+      "kubectl list *": "allow",
+      "kubectl logs *": "allow",
+      "oc *": "ask",
+      "oc get *": "allow",
+      "oc list *": "allow",
+      "oc logs *": "allow",
+      "ocm *": "ask",
+      "ocm get *": "ask",
+      "ocm list *": "ask",
+      "rtk *": "allow",
+      "rtk oc *": "ask",
+      "rtk oc get": "allow",
+      "rtk oc list": "allow",
+      "rtk kubectl *": "ask",
+      "rtk pulumi *": "deny"
+    },
+    "external_directory": {
+      "*": "ask",
+      "~/code/*": "allow"
+    }
+  }
+}
