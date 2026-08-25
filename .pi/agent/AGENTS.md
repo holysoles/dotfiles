@@ -10,3 +10,4 @@
 
 # Environment
 - Prefer CLIs. Installed: gh, glab, pd, acli
+- use jq

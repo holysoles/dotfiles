@@ -14,5 +14,10 @@
   ],
   "extensions": [
     "extensions/rtk"
+  ],
+  "enabledModels": [
+    "anthropic/claude-opus-4-6",
+    "anthropic/claude-sonnet-5",
+    "anthropic/claude-haiku-4-5"
   ]
 }
