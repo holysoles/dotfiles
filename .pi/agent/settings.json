@@ -12,12 +12,12 @@
     "npm:@twogiants/pi-anthropic-vertex",
     "npm:@gotgenes/pi-permission-system"
   ],
-  "extensions": [
-    "extensions/rtk"
-  ],
   "enabledModels": [
-    "anthropic/claude-opus-4-6",
-    "anthropic/claude-sonnet-5",
-    "anthropic/claude-haiku-4-5"
-  ]
+    "anthropic-vertex/claude-opus-4-6",
+    "anthropic-vertex/claude-sonnet-4-6",
+    "anthropic-vertex/claude-haiku-4-5"
+  ],
+  "shellEnv": {
+    "GIT_EDITOR": "true"
+  }
 }
