@@ -114,6 +114,17 @@ dot () {
 printf "\n\n"
 read -e -p "Should this machine have write access to GitHub? [y/N]" use_ssh
 
+setup_sparse_submodule() {
+    dot submodule update --init --no-fetch --no-checkout "$HOME/$1"
+    cd "$HOME/$1"
+    git sparse-checkout init --no-cone
+    git sparse-checkout set "$2"
+    git fetch && git checkout
+}
+setup_submodule() {
+dot submodule update --init -- $1
+}
+
 dotfiles="$HOME/.dotfiles"
 PUBLIC_REPOS=''
 if [ ! -d $dotfiles ]; then
@@ -144,7 +155,10 @@ if [ ! -d $dotfiles ]; then
 
     # actually checkout the config
     dot checkout
-    dot submodule update --init -- $PUBLIC_REPOS
+
+    setup_submodule $PUBLIC_REPOS
+    setup_sparse_submodule ".pi/agent/extensions/.rtk" "hooks/pi/rtk.ts"
+    setup_sparse_submodule ".pi/agent/extensions/.mitsuhiko" "extensions/answer.ts"
 else
     dot pull
     dot submodule update

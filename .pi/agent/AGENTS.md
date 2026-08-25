@@ -9,5 +9,5 @@
 - For org specific info, see @RH.md
 
 # Environment
-- Prefer CLIs. Installed: gh, glab, pd, acli
+- Prefer CLIs. Installed: `gh`, `glab`, `pd`, `acli jira`, `slackcli`
 - use jq
