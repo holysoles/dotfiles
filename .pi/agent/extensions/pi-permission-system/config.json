@@ -17,14 +17,15 @@
 
       "cd *": "allow",
       "pwd": "allow",
+      "which *": "allow",
       "echo *": "allow",
       "find *": "allow",
       "for *": "ask",
       "ls *": "allow",
-      "wc -l": "allow",
-      "tr": "allow",
+      "wc -l *": "allow",
+      "tr *": "allow",
       "grep *": "allow",
-      "xargs grep": "allow",
+      "xargs grep *": "allow",
       "rg *": "allow",
       "tail *": "allow",
       "head *": "allow",
@@ -82,6 +83,9 @@
       "pd incident list *": "allow",
       "pd incident notes *": "ask",
       "pd incident alerts *": "allow",
+
+      "acli jira issue view *": "allow",
+      "acli jira workitem view *": "allow",
 
       "pytest *": "allow",
       "ruff *": "allow",
