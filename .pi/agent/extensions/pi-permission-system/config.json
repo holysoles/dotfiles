@@ -24,6 +24,7 @@
       "wc -l": "allow",
       "tr": "allow",
       "grep *": "allow",
+      "xargs grep": "allow",
       "rg *": "allow",
       "tail *": "allow",
       "head *": "allow",
