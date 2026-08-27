@@ -1,8 +1,9 @@
-# osdctl Skill
-
+---
+name: osdctl
+description: detailed usage of osdctl
+---
 CLI toolbox for ROSA/OSD SRE operations — cluster triage, AWS account management, service logs, alerts, Hive, HCP, and RHOBS.
 
-Binary: `/home/paevans/.local/bin/backplane/latest/osdctl`
 Source: `~/code/osdctl/`
 Config: `~/.config/osdctl` (YAML, auto-created on first run)
 
@@ -241,3 +242,5 @@ Jira integration.
 - **Bulk service log**: `servicelog post -q "..."  -t template.json --dry-run` then drop `--dry-run`
 - **Hive resync**: `hive csf -C $ID` to confirm failures → `cluster resync -C $ID`
 - **AWS access**: `account cli` or `account console` for temp creds/console
+
+

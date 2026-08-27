@@ -4,6 +4,8 @@
   "defaultProvider": "anthropic-vertex",
   "defaultModel": "claude-sonnet-4-6",
   "defaultThinkingLevel": "medium",
+  "hideThinkingBlock": true,
+  "showCacheMissNotices": true,
   "packages": [
     "npm:@plannotator/pi-extension",
     "npm:@dietrichgebert/ponytail",
@@ -26,6 +28,5 @@
   ],
   "env": {
     "GIT_EDITOR": "true"
-  },
-  "hideThinkingBlock": true
+  }
 }
