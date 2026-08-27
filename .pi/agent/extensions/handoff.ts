@@ -11,7 +11,21 @@
  * Tab-completes model names from the enabled models list.
  */
 
-import type { ExtensionAPI } from "@earendil-works/pi-coding-agent";
+import type { AgentMessage } from "@earendil-works/pi-agent-core";
+import { type Message, uuidv7 } from "@earendil-works/pi-ai";
+import {
+	BorderedLoader,
+	convertToLlm,
+	getAgentDir,
+	SettingsManager,
+	type ExtensionAPI,
+	type SessionEntry,
+} from "@earendil-works/pi-coding-agent";
+import { spawn } from "node:child_process";
+import { mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
+import { Text, type TUI } from "@earendil-works/pi-tui";
 
 const SUMMARY_REQUEST = `Summarize this session for handoff to a new session. Output only the summary, no preamble. Use exactly this format:
 
@@ -30,10 +44,73 @@ Paths to files that were recently read or modified (bullet list).
 ## Immediate Next Steps
 Exactly what the next task should be, in priority order (bullet list).`;
 
+function entryToMessage(entry: SessionEntry): AgentMessage | undefined {
+	if (entry.type === "message") return entry.message;
+	if (entry.type === "compaction") {
+		return {
+			role: "compactionSummary",
+			summary: entry.summary,
+			tokensBefore: entry.tokensBefore,
+			timestamp: new Date(entry.timestamp).getTime(),
+		};
+	}
+}
+
+function getHandoffMessages(branch: SessionEntry[]) {
+	const compactionIndex = branch.findLastIndex(
+		(entry) => entry.type === "compaction",
+	);
+	if (compactionIndex < 0)
+		return branch.map(entryToMessage).filter((message) => message !== undefined);
+
+	const compaction = branch[compactionIndex];
+	if (!compaction) return [];
+	const firstKeptIndex =
+		compaction.type === "compaction"
+			? branch.findIndex((entry) => entry.id === compaction.firstKeptEntryId)
+			: -1;
+	return [
+		compaction,
+		...(firstKeptIndex >= 0 ? branch.slice(firstKeptIndex, compactionIndex) : []),
+		...branch.slice(compactionIndex + 1),
+	]
+		.map(entryToMessage)
+		.filter((message) => message !== undefined);
+}
+
+async function editInExternalEditor(
+	tui: TUI,
+	command: string,
+	content: string,
+) {
+	const directory = mkdtempSync(join(tmpdir(), "pi-editor-"));
+	const filePath = join(directory, "handoff.md");
+	try {
+		writeFileSync(filePath, content, "utf8");
+		const [editor, ...args] = command.split(" ");
+		tui.stop();
+		const exitCode = await new Promise<number | null>((resolve) => {
+			const child = spawn(editor, [...args, filePath], {
+				stdio: "inherit",
+				shell: false,
+			});
+			child.on("error", () => resolve(null));
+			child.on("close", resolve);
+		});
+		return exitCode === 0
+			? readFileSync(filePath, "utf8")
+					.replace(/^\uFEFF/, "")
+					.replace(/\n$/, "")
+			: undefined;
+	} finally {
+		tui.start();
+		tui.requestRender(true);
+		rmSync(directory, { recursive: true, force: true });
+	}
+}
+
 export default function (pi: ExtensionAPI) {
 	let cachedModels: string[] = [];
-	let pendingResolveSummary: ((text: string | null) => void) | null = null;
-	let capturedSummaryText: string | null = null;
 
 	pi.on("session_start", async (_event, ctx) => {
 		const scoped = ctx.scopedModels;
@@ -44,30 +121,6 @@ export default function (pi: ExtensionAPI) {
 				.getAvailable()
 				.map((m) => `${m.provider}/${m.id}`);
 		}
-	});
-
-	// Capture text at agent_end; resolve only at agent_settled so navigateTree
-	// is safe to call immediately after the promise resolves.
-	pi.on("agent_end", (event) => {
-		if (!pendingResolveSummary) return;
-		const msg = [...event.messages].reverse().find((m) => m.role === "assistant");
-		if (!msg) return;
-		const content = (msg as { content: Array<{ type: string; text?: string }> })
-			.content;
-		capturedSummaryText =
-			content
-				.filter((c) => c.type === "text" && c.text)
-				.map((c) => c.text!)
-				.join("\n")
-				.trim() || null;
-	});
-
-	pi.on("agent_settled", () => {
-		if (!pendingResolveSummary) return;
-		const resolve = pendingResolveSummary;
-		pendingResolveSummary = null;
-		resolve(capturedSummaryText);
-		capturedSummaryText = null;
 	});
 
 	pi.registerCommand("handoff", {
@@ -85,7 +138,8 @@ export default function (pi: ExtensionAPI) {
 				return;
 			}
 
-			if (!ctx.model) {
+			const model = ctx.model;
+			if (!model) {
 				ctx.ui.notify("No model selected", "error");
 				return;
 			}
@@ -118,30 +172,47 @@ export default function (pi: ExtensionAPI) {
 				return;
 			}
 			const currentSessionFile = ctx.sessionManager.getSessionFile();
-			// Capture the leaf before the summary exchange so we can rewind after.
-			const preHandoffLeafId = branch.at(-1)?.id;
 
-			// --- Step 3: Generate summary through the current session's agent loop ---
-			// Sending as a real turn reuses the provider's existing KV cache for the
-			// conversation, rather than rebuilding it in a separate completion call.
-			if (pendingResolveSummary) {
-				ctx.ui.notify("Handoff already in progress", "error");
-				return;
-			}
-			const summaryPromise = new Promise<string | null>((resolve) => {
-				pendingResolveSummary = resolve;
-			});
-			pi.sendUserMessage(SUMMARY_REQUEST);
-			await ctx.waitForIdle();
-			const summary = await summaryPromise;
+			// --- Step 3: Generate a hidden summary with only a spinner in the TUI ---
+			const summary = await ctx.ui.custom<string | null>(
+				(tui, theme, _keybindings, done) => {
+					const loader = new BorderedLoader(
+						tui,
+						theme,
+						"Generating handoff summary...",
+					);
+					loader.onAbort = () => done(null);
+					const summaryRequest: Message = {
+						role: "user",
+						content: [{ type: "text", text: SUMMARY_REQUEST }],
+						timestamp: Date.now(),
+					};
+					void ctx.modelRegistry
+						.complete(
+							model,
+							{
+								systemPrompt: ctx.getSystemPrompt(),
+								messages: [...convertToLlm(getHandoffMessages(branch)), summaryRequest],
+							},
+							{ signal: loader.signal, cacheRetention: "none", sessionId: uuidv7() },
+						)
+						.then((response) => {
+							if (response.stopReason === "aborted") {
+								done(null);
+								return;
+							}
+							const text = response.content
+								.flatMap((content) => (content.type === "text" ? [content.text] : []))
+								.join("\n")
+								.trim();
+							done(text || null);
+						})
+						.catch(() => done(null));
+					return loader;
+				},
+			);
 
-			// --- Step 4: Rewind session to before the summary exchange ---
-			// Leaves the original conversation intact for future resumption.
-			if (preHandoffLeafId) {
-				await ctx.navigateTree(preHandoffLeafId);
-			}
-
-			// --- Step 5: Handle cancellation or empty summary ---
+			// --- Step 4: Handle cancellation or empty summary ---
 			if (!summary?.trim()) {
 				ctx.ui.notify(
 					summary === null ? "Handoff cancelled" : "Handoff failed: empty summary",
@@ -150,7 +221,35 @@ export default function (pi: ExtensionAPI) {
 				return;
 			}
 
-			// --- Step 5: Create new session, inject context, optionally switch model ---
+			const summaryLines = summary.split("\n");
+			const preview = summaryLines.slice(0, 25).join("\n");
+			const choice = await ctx.ui.select(
+				`Handoff summary preview\n\n${preview}${summaryLines.length > 25 ? "\n…" : ""}`,
+				["Continue with this summary", "Edit summary"],
+			);
+			if (!choice) {
+				ctx.ui.notify("Handoff cancelled", "info");
+				return;
+			}
+
+			const handoffSummary =
+				choice === "Edit summary"
+					? await ctx.ui.custom<string | undefined>(
+							(tui, _theme, _keybindings, done) => {
+								const command = SettingsManager.create(ctx.cwd, getAgentDir(), {
+									projectTrusted: ctx.isProjectTrusted(),
+								}).getExternalEditorCommand();
+								void editInExternalEditor(tui, command, summary).then(done);
+								return new Text("Opening external editor…", 1, 0);
+							},
+						)
+					: summary;
+			if (!handoffSummary?.trim()) {
+				ctx.ui.notify("Handoff cancelled", "info");
+				return;
+			}
+
+			// --- Step 6: Create new session, inject context, optionally switch model ---
 			let newSessionResult: Awaited<ReturnType<typeof ctx.newSession>>;
 			try {
 				newSessionResult = await ctx.newSession({
@@ -158,7 +257,7 @@ export default function (pi: ExtensionAPI) {
 					setup: async (sm) => {
 						sm.appendCustomMessageEntry(
 							"handoff",
-							`# Context from previous session\n\n${summary}`,
+							`# Context from previous session\n\n${handoffSummary}`,
 							false, // hidden from TUI, present in LLM context
 						);
 						if (targetProvider && targetModelId) {
@@ -166,9 +265,7 @@ export default function (pi: ExtensionAPI) {
 						}
 					},
 					withSession: async (replacementCtx) => {
-						await replacementCtx.sendUserMessage(
-							"Resume our work from where we left off. Context from the previous session has been loaded.",
-						);
+						replacementCtx.ui.notify("Handoff complete. Enter the next step.", "info");
 					},
 				});
 			} catch (err) {
