@@ -21,6 +21,8 @@
 
       "cd *": "allow",
       "pwd": "allow",
+      "sleep *": "allow",
+      "date *": "allow",
       "which *": "allow",
       "command *": "allow",
       "echo *": "allow",
@@ -61,8 +63,10 @@
 
       "kubectl *": "ask",
       "kubectl get *": "allow",
+      "kubectl describe *": "allow",
       "kubectl list *": "allow",
       "kubectl logs *": "allow",
+      "kubectl wait *": "allow",
       "oc *": "ask",
       "oc get *": "allow",
       "oc describe *": "allow",
@@ -85,6 +89,8 @@
       "rtk oc list *": "allow",
       "rtk oc adm top *": "allow",
       "rtk kubectl *": "ask",
+      "rtk kubectl get *": "allow",
+      "rtk kubectl logs *": "allow",
       "rtk pulumi *": "deny",
 
       "pd rest get *": "allow",
@@ -95,6 +101,10 @@
 
       "acli jira issue view *": "allow",
       "acli jira workitem view *": "allow",
+
+      "gh run list *": "allow",
+      "gh run view *": "allow",
+      "gh run watch *": "allow",
 
       "pytest *": "allow",
       "ruff *": "allow",
