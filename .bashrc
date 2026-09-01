@@ -114,6 +114,7 @@ elif command -v batcat > /dev/null; then
 fi
 if [ "$WORK" == "true" ]; then
     alias occ='osdctl cluster context -C'
+    alias ocmb='ocm-backplane'
 fi
 CLIP=xsel
 PASTE=xsel
@@ -154,6 +155,14 @@ if [ "$WORK" == "true" ]; then
 
     function ocml(){
         ocm login --use-auth-code --url=$1
+    }
+
+    function ocmbl(){
+        local target="${1:-$CLUSTER_ID}"
+        if [[ $# -gt 0 ]]; then
+            shift
+        fi
+        ocm-backplane login "$target" "$@"
     }
 fi
 
