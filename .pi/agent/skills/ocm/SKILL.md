@@ -2,8 +2,8 @@
 name: ocm
 description: >-
   Working with the `ocm` CLI for OpenShift Cluster Manager. Use for clusters,
-  machine pools, add-ons, IDPs, upgrade policies, account/org info, and raw
-  REST calls to the OCM API.
+  machine pools, add-ons, IDPs, upgrade policies, account/org info, and raw REST
+  calls to the OCM API.
 ---
 # OCM CLI
 
@@ -40,6 +40,16 @@ ocm config set url https://api.openshift.com
 ```
 
 ### Clusters
+
+### Deleted cluster check
+
+Deleted clusters return 404 from Clusters Management, but their subscription may remain:
+
+```sh
+~/.pi/agent/skills/ocm/scripts/cluster-history.sh <OCM_CLUSTER_ID>
+```
+
+For deprovisioned clusters, `updated_at` is an estimate—not a confirmed deletion time.
 
 ```sh
 # List clusters (all columns by default)
@@ -182,3 +192,5 @@ ocm delete /api/clusters_mgmt/v1/clusters/<ID>/machine_pools/<MP_ID>
 - **ID types**: OCM internal ID (alphanumeric, e.g. `1abc2def`), external ID (UUID), and display name are all accepted by most commands.  
   Use `ocm describe cluster --json <name> | jq '.id,.external_id'` to resolve them.
 - **Pagination**: `ocm list` commands paginate automatically. For bounded queries against large result sets, use `ocm get` with `-p "size=10"` and `-p "page=1"`.
+
+
