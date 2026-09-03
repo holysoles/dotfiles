@@ -30,8 +30,15 @@ Always pass `-b <alias>` if the user has multiple accounts configured.
 ### Incidents
 
 ```sh
-# Get a single incident by ID (no -i flag on list; use REST)
-pd rest get -e /incidents/<ID>
+# Get a single incident by ID (response fields are under .incident)
+pd rest get -e /incidents/<ID> | jq '.incident'
+
+# Get the incident timeline, including notes
+pd rest get -e '/incidents/<ID>/log_entries?is_overview=false&include[]=channels&limit=100'
+
+# Extract notes from the timeline
+pd rest get -e '/incidents/<ID>/log_entries?is_overview=false&include[]=channels&limit=100' |
+  jq -r '.log_entries[] | select(.type == "annotate_log_entry") | .channel.content'
 
 # Get alerts for an incident (prefer this over REST)
 pd incident alerts -i <ID>
@@ -113,6 +120,7 @@ pd rest post -e /incidents -d @payload.json
 
 - Pipe `-p` output between commands (IDs on stdout) to chain bulk actions.
 - Use `--output=json` for machine-readable output; unlike `-j`, it doesn't mix progress lines into stdout. Other options: `csv`, `yaml`.
+- Do not merge stderr into stdout (`2>&1`) before piping JSON to `jq`; PagerDuty progress messages can make the stream invalid JSON.
 - **Incident urgency is only `high` or `low`** — there's no "critical" value. Alert severity (Critical/Warning) lives in the alert title or alert body, not the incident urgency field. To find the most critical incidents, filter by title: `select(.title | test("CRITICAL"; "i"))`.
 - `pd incident list --since 2h` scopes to recent incidents (duration strings accepted).
 - Use `pd incident list --limit <N>` for bounded queries; it disables full pagination.

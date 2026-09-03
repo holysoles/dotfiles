@@ -93,9 +93,16 @@ osdctl hcp force-upgrade -C "$CLUSTER_ID" --target-y 4.16 \
 
 ### AWS access
 
+`account cli` requires an AWS account ID and assumes that account's
+`OrganizationAccountAccessRole`. Its default output is shell exports and its
+default region is `us-east-1`; set `-r` to the target resource's region.
+
 ```bash
-osdctl account cli -i "$AWS_ACCOUNT_ID" -p "$PROFILE"
-osdctl account console -i "$AWS_ACCOUNT_ID" --launch
+eval "$(osdctl account cli -p "${PROFILE}" -i "${AWS_ACCOUNT_ID}" \
+  -r "${REGION}" -o env)"
+aws sts get-caller-identity
+osdctl account console -i "${AWS_ACCOUNT_ID}" -p "${PROFILE}" \
+  -r "${REGION}" --launch
 ```
 
 ### Network verification

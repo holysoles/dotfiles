@@ -74,6 +74,14 @@ ocm describe cluster --json mycluster | jq '.state'
 ocm cluster status mycluster
 ```
 
+Management clusters may have a null `.aws.account_id`. Derive the AWS account
+ID from the support role ARN instead:
+
+```sh
+AWS_ACCOUNT_ID=$(ocm describe cluster --json "${MC_ID}" |
+  jq -r '.aws.sts.support_role_arn | split(":")[4]')
+```
+
 ### Cluster Resources
 
 ```sh
@@ -191,6 +199,7 @@ ocm delete /api/clusters_mgmt/v1/clusters/<ID>/machine_pools/<MP_ID>
 - **Env aliases** for `--url` / `ocm config set url`: `production` (default), `staging`, `integration`.
 - **ID types**: OCM internal ID (alphanumeric, e.g. `1abc2def`), external ID (UUID), and display name are all accepted by most commands.  
   Use `ocm describe cluster --json <name> | jq '.id,.external_id'` to resolve them.
+- **Misleading not-found errors**: An expired OCM session can make `ocm describe cluster` report that no subscription or cluster matches. Run `ocm whoami`; if authentication failed, log in and retry before concluding the cluster is absent.
 - **Pagination**: `ocm list` commands paginate automatically. For bounded queries against large result sets, use `ocm get` with `-p "size=10"` and `-p "page=1"`.
 
 
