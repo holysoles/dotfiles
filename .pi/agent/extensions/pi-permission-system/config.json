@@ -19,6 +19,7 @@
       "true": "allow",
       "false": "allow",
       "test *": "allow",
+      "file *": "allow",
 
       "cd *": "allow",
       "pwd": "allow",
