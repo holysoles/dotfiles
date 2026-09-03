@@ -50,6 +50,9 @@ fi
 if [ -f "$HOME/.cargo/env" ]; then
     . "$HOME/.cargo/env"
 fi
+if [ -d "$HOME/.npm-global/bin" ]; then
+    export PATH="$PATH:$HOME/.npm-global/bin/"
+fi
 if [ "$PLATFORM" = "mac" ]; then
     export PATH="/opt/homebrew/bin:$PATH"
 fi
@@ -115,6 +118,8 @@ fi
 if [ "$WORK" == "true" ]; then
     alias occ='osdctl cluster context -C'
     alias ocmb='ocm-backplane'
+else
+    alias oclaude='ollama launch claude --'
 fi
 CLIP=xsel
 PASTE=xsel
