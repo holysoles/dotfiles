@@ -211,12 +211,14 @@ if command -v kubectl > /dev/null; then
       curr_arg=${COMP_WORDS[COMP_CWORD]}
       COMPREPLY=( $(compgen -W "- $(kubectl config get-contexts --output='name')" -- $curr_arg ) );
     }
+    alias kctx='kubectx'
     complete -o default -F _kube_contexts kubectx kctx
     _kube_namespaces() {
       local curr_arg;
       curr_arg=${COMP_WORDS[COMP_CWORD]}
       COMPREPLY=( $(compgen -W "- $(kubectl get namespaces -o=jsonpath='{range .items[*].metadata.name}{@}{"\n"}{end}')" -- $curr_arg ) );
     }
+    alias kns='kubens'
     complete -o default -F _kube_namespaces kubens kns
 fi
 
