@@ -20,6 +20,7 @@
       "false": "allow",
       "test *": "allow",
       "file *": "allow",
+      "mktmp *": "allow",
 
       "cd *": "allow",
       "pwd": "allow",
@@ -56,6 +57,7 @@
 
       "git *": "ask",
       "git log *": "allow",
+      "git reflog *": "allow",
       "git status *": "allow",
       "git diff *": "allow",
       "git apply *": "allow",
@@ -64,6 +66,7 @@
       "git checkout -- *": "allow",
       "git ls-files *": "allow",
       "git ls-tree *": "allow",
+      "git ls-remote *": "allow",
       "git blame *": "allow",
       "git rev-parse *": "allow",
       "git remote -v": "allow",
@@ -84,6 +87,7 @@
       "ocm *": "ask",
       "ocm get *": "allow",
       "ocm list *": "allow",
+      "ocm describe *": "allow",
       "ocm config get *": "allow",
       
       "osdctl org *": "allow",
