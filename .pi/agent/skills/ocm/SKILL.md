@@ -74,12 +74,21 @@ ocm describe cluster --json mycluster | jq '.state'
 ocm cluster status mycluster
 ```
 
-Management clusters may have a null `.aws.account_id`. Derive the AWS account
-ID from the support role ARN instead:
+### Management-cluster AWS access
+
+`ocm backplane cloud credentials` may not have the
+`OrganizationAccountAccessRole` access needed for management-cluster AWS
+investigations. Authenticate to the MC's payer account, then use `osdctl` to
+assume that role. Management clusters may have a null `.aws.account_id`, so
+derive it from the support role ARN:
 
 ```sh
+PAYER_AWS_ACCOUNT="<payer-account-for-the-management-cluster-environment>"
+eval "$(rh-aws-saml-login --output env "${PAYER_AWS_ACCOUNT}")"
 AWS_ACCOUNT_ID=$(ocm describe cluster --json "${MC_ID}" |
   jq -r '.aws.sts.support_role_arn | split(":")[4]')
+eval "$(osdctl account cli -i "${AWS_ACCOUNT_ID}" -r "${REGION}" -o env)"
+aws sts get-caller-identity
 ```
 
 ### Cluster Resources
