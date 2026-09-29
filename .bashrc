@@ -129,6 +129,7 @@ if [ "$XDG_SESSION_TYPE" = 'wayland' ]; then
 fi
 alias clip=$CLIP
 alias paste=$PASTE
+alias pi-edit-perms='$EDITOR ~/.pi/agent/extensions/pi-permission-system/config.json'
 
 # functions
 function mkcd() {

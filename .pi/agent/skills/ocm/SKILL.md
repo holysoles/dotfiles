@@ -28,6 +28,43 @@ ocm token           # print current access token (pipe to curl etc.)
 ocm token --payload # decode JWT payload
 ```
 
+### Backplane Prometheus token
+
+For an authenticated port-forward to CMO Prometheus, create a short-lived token
+with an approved ticket in `REASON`. Keep it in a shell variable; do not print
+or commit it.
+
+```sh
+TOKEN=$(ocm-backplane elevate "$REASON" -- \
+  create token -n openshift-monitoring prometheus-k8s)
+curl -fsS -H "Authorization: Bearer $TOKEN" \
+  http://localhost:8080/api/v1/query \
+  --data-urlencode 'query=up'
+```
+
+### Backplane cluster access
+
+`ocm backplane` is the Backplane plugin for direct target-cluster access. Confirm
+which cluster the current kubeconfig selects before acting:
+
+```sh
+ocm backplane status
+```
+
+For privileged inspection or mutation, ask the user for an approved ticket URL
+for the **current session**; never reuse or assume a reason from another
+session. Then pass Kubernetes arguments directly—do **not** put `oc` after
+`--`:
+
+```sh
+ocm backplane elevate "https://redhat.atlassian.net/browse/ROSAENG-12345" -- \
+  -n <namespace> get <resource>
+```
+
+The elevation applies to the effective kubeconfig cluster and its reason is
+reused for 20 minutes. `ocm-backplane` is the standalone plugin spelling and
+is interchangeable with `ocm backplane` where the plugin is installed.
+
 ### Config
 
 ```sh
