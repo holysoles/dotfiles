@@ -99,6 +99,7 @@ alias vim='nvim'
 alias dot='/usr/bin/git --git-dir=$HOME/.dotfiles --work-tree=$HOME'
 alias gpf='git push --force-with-lease'
 alias gfrp="git fetch && git rebase && git push"
+alias gfixup="git commit --fixup HEAD && git rebase -i HEAD~2"
 # Add an "alert" alias for long running commands.  Use like so:
 #   sleep 10; alert
 alias alert='notify-send --urgency=low -i "$([ $? = 0 ] && echo terminal || echo error)" "$(history|tail -n1|sed -e '\''s/^\s*[0-9]\+\s*//;s/[;&|]\s*alert$//'\'')"'
@@ -118,6 +119,7 @@ fi
 if [ "$WORK" == "true" ]; then
     alias occ='osdctl cluster context -C'
     alias ocmb='ocm-backplane'
+    alias ocmc="ocm-container"
 else
     alias oclaude='ollama launch claude --'
 fi
