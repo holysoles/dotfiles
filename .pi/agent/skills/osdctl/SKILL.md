@@ -20,6 +20,12 @@ Config: `~/.config/osdctl` (created by `osdctl setup`)
 - Before mutating state, show the target and command, use `--dry-run` when available, and get confirmation unless the user explicitly requested the mutation.
 - `-S, --skip-version-check` is the only universal operational flag.
 
+### Environment preflight
+
+- Before RHOBS work, check `ocm config get url` and use a cluster ID from the same environment as the data.
+- `--hive-ocm-url` selects the Hive lookup environment; it does not switch the current OCM API environment. For a one-shot production call, use `OCM_URL=https://api.openshift.com` (use `https://api.stage.openshift.com` for stage); `OCM_URL` takes a URL, not the alias `production`.
+- For RHOBS cell resolution, use an HCP cluster ID in the target environment, not a Hive MC name. Confirm `osdctl rhobs cell -C <hcp-id>` returns a cell before running metrics queries. A cell lookup failure means the environment/cluster route is unresolved, not that there are no metrics.
+
 ## Setup
 
 ```bash
@@ -47,6 +53,24 @@ osdctl setup
 Use `osdctl --help` for less-common groups such as `cost`, `env`, `evidence`,
 `iampermissions`, `mc`, and `swarm`.
 
+### RHOBS rules promotion
+
+Promote a single tenant-rules commit with its SaaS service ID and source-repo SHA:
+
+```bash
+osdctl promote rhobs \
+  --serviceId saas-hcp-rules \
+  --gitHash "$RULES_SHA" \
+  --appInterfaceDir ~/code/app-interface \
+  --configRepoDir ~/code/rosa-rhobs-rules
+```
+
+Use `saas-mc-rules` or `saas-sc-rules` for those rule families. The app-interface checkout must be clean. The command creates a branch and commit; push it and open an MR. For tenant rules, it promotes the initial production wave; later waves use their existing soak and post-deploy gates.
+
+For this service-specific flow, `--configRepoDir` overrides the resource-template repo used to resolve the SHA. Point it at the rules repo checkout and make sure that checkout has fetched the commit. Do not use `--latest` or omit `--serviceId` for a single `rosa-rhobs-rules` commit; those are for bulk RHOBS configuration promotion.
+
+New rules labeled `severity: soaking` already route through the RHOBS soaking receiver; no separate Alertmanager route change is needed just to deploy one.
+
 ## Core workflows
 
 ### Incident triage
@@ -62,6 +86,19 @@ osdctl hcp status -C "$CLUSTER_ID" # HCP only
 
 `cluster context --full` can return partial results after collection errors;
 a failed check means unknown, not empty.
+
+### Backplane reports
+
+```bash
+osdctl cluster reports list -C "$CLUSTER_ID" --last 5
+osdctl cluster reports create -C "$CLUSTER_ID" \
+  --summary "Test report" --data "Report contents"
+```
+
+`--data` accepts plain text and is base64-encoded by osdctl; use `--file` for
+file contents. Creating a report writes to the configured backplane-api
+environment, not to the cluster. Check the Backplane URL and proxy config
+before creating test data; report access requires an authorized Backplane role.
 
 ### Hive resync
 

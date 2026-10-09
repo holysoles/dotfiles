@@ -1,5 +1,5 @@
 {
-  "lastChangelogVersion": "0.87.0",
+  "lastChangelogVersion": "1.0.0",
   "theme": "dark",
   "defaultProvider": "openai",
   "defaultModel": "gpt-5.6-terra",
@@ -17,12 +17,9 @@
     "npm:pi-context-view"
   ],
   "enabledModels": [
-    "anthropic-vertex/claude-opus-4-6",
-    "anthropic-vertex/claude-sonnet-4-6",
-    "anthropic-vertex/claude-haiku-4-5",
-    "openai/gpt-5.6-luna",
-    "openai/gpt-5.6-terra",
-    "openai/gpt-5.6-sol"
+    "openai/gpt-6-luna",
+    "openai/gpt-6-sol",
+    "openai/gpt-6-astra"
   ],
   "projectPrompts": [
     ".claude/commands"
@@ -32,5 +29,8 @@
   ],
   "env": {
     "GIT_EDITOR": "true"
-  }
+  },
+  "extensions": [
+    "-builtin:mcp"
+  ]
 }

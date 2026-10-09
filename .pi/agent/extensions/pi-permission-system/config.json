@@ -72,6 +72,7 @@
       "git branch --show-current": "allow",
       "git branch -avv": "allow",
       "git checkout -- *": "allow",
+      "git switch *": "allow",
       "git ls-files *": "allow",
       "git ls-tree *": "allow",
       "git ls-remote *": "allow",
@@ -79,6 +80,8 @@
       "git rev-parse *": "allow",
       "git grep *": "allow",
       "git remote -v": "allow",
+      "git remote get-url *": "allow",
+      "git cat-file *": "allow",
 
       "kubectl *": "ask",
       "kubectl get *": "allow",
@@ -106,12 +109,14 @@
       "ocm config get *": "allow",
       "ocm whoami": "allow",
       "ocm backplane *": "ask",
+      "ocm backplane status": "ask",
       "ocm backplane login --readonly *": "allow",
       
       "osdctl org *": "allow",
       "osdctl rhobs *": "allow",
       "osdctl cluster context *": "allow",
       "osdctl mc list *": "allow",
+      "osdctl version": "allow",
 
       "rtk *": "allow",
       "rtk oc *": "ask",
@@ -140,11 +145,14 @@
       "acli jira issue search *": "allow",
       "acli jira workitem view *": "allow",
       "acli jira workitem search *": "allow",
+      "acli jira workitem comment list *": "allow",
 
       "gh run list *": "allow",
       "gh run view *": "allow",
       "gh run watch *": "allow",
       "gh pr list *": "allow",
+      "gh pr view *": "allow",
+      "gh pr diff *": "allow",
       "gh api /repos/*": "allow",
       "gh api repos/*": "allow",
 
@@ -153,7 +161,9 @@
       "glab repo view *": "allow",
       "glab repo search *": "allow",
       "glab api 'projects*": "allow",
+      "glab auth status": "allow",
 
+      "promtool check *": "allow",
       "pytest *": "allow",
       "ruff *": "allow",
       "black *": "allow",
@@ -163,6 +173,8 @@
       "go vet *": "allow",
       "go test *": "allow",
       "go env *": "allow",
+      "go doc *": "allow",
+      "go list *": "allow",
       "cargo fmt *": "allow",
       "cargo check *": "allow",
       "cargo test *": "allow",
@@ -176,12 +188,14 @@
     "external_directory": {
       "*": "ask",
       "$HOME/code/*": "allow",
-      "/home/paevans/code/*": "allow",
       "$HOME/go/pkg/mod/*": "allow",
       "~/go/pkg/mod/*": "allow",
       "/tmp/*": "allow",
+      "/dev/stdin": "allow",
 
+      "~/.pi/agent/sessions/": "allow",
       "/usr/local/lib/node_modules/@earendil-works/pi-coding-agent/docs/*": "allow",
+      "/~/.local/share/rtk/*": "allow",
 
       "/incidents/*": "allow",
       "/api/*": "allow",

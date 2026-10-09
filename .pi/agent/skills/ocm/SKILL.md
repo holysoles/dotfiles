@@ -28,6 +28,39 @@ ocm token           # print current access token (pipe to curl etc.)
 ocm token --payload # decode JWT payload
 ```
 
+### Environment selection
+
+Check the active endpoint before querying clusters: `ocm config get url`. OCM commands use that configured environment unless overridden. For a one-shot environment override, `OCM_URL` must be a full URL (for example, `OCM_URL=https://api.openshift.com` for production); aliases such as `production` are for `ocm config set url`, not the `OCM_URL` environment variable. Prefer the one-shot override to changing the persistent config for an investigation.
+
+### Backplane cluster access
+
+`ocm backplane` is the Backplane plugin for direct target-cluster access. Confirm
+which cluster the current kubeconfig selects before acting:
+
+```sh
+ocm backplane status
+```
+
+For a hosted cluster, `ocm backplane login --manager "${CLUSTER_ID}"` selects its management cluster without parsing `ocm describe cluster` output. `ocm backplane login --service "${CLUSTER_ID}"` selects its service cluster; `--service` also accepts a management cluster ID. Check `ocm backplane status` afterward to confirm the target.
+
+### Backplane elevated access
+
+For privileged inspection or mutation, ask the user for an approved ticket URL
+for the **current session**; never reuse or assume a reason from another
+session. Then pass Kubernetes arguments directly—do **not** put `oc` after
+`--`:
+
+```sh
+ocm backplane elevate "https://redhat.atlassian.net/browse/ROSAENG-12345" -- \
+  -n <namespace> get <resource>
+```
+
+The elevation applies to the effective kubeconfig cluster and its reason is
+reused for 20 minutes. Always pass the approved reason explicitly: `elevate -n`
+means **no reason argument**, and may prompt or reuse the previous reason.
+`ocm-backplane` is the standalone plugin spelling and is interchangeable with
+`ocm backplane` where the plugin is installed.
+
 ### Backplane Prometheus token
 
 For an authenticated port-forward to CMO Prometheus, create a short-lived token
@@ -42,28 +75,6 @@ curl -fsS -H "Authorization: Bearer $TOKEN" \
   --data-urlencode 'query=up'
 ```
 
-### Backplane cluster access
-
-`ocm backplane` is the Backplane plugin for direct target-cluster access. Confirm
-which cluster the current kubeconfig selects before acting:
-
-```sh
-ocm backplane status
-```
-
-For privileged inspection or mutation, ask the user for an approved ticket URL
-for the **current session**; never reuse or assume a reason from another
-session. Then pass Kubernetes arguments directly—do **not** put `oc` after
-`--`:
-
-```sh
-ocm backplane elevate "https://redhat.atlassian.net/browse/ROSAENG-12345" -- \
-  -n <namespace> get <resource>
-```
-
-The elevation applies to the effective kubeconfig cluster and its reason is
-reused for 20 minutes. `ocm-backplane` is the standalone plugin spelling and
-is interchangeable with `ocm backplane` where the plugin is installed.
 
 ### Config
 
