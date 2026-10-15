@@ -91,14 +91,17 @@ a failed check means unknown, not empty.
 
 ```bash
 osdctl cluster reports list -C "$CLUSTER_ID" --last 5
+osdctl cluster reports get -C "$CLUSTER_ID" --report-id "$REPORT_ID"
 osdctl cluster reports create -C "$CLUSTER_ID" \
   --summary "Test report" --data "Report contents"
 ```
 
-`--data` accepts plain text and is base64-encoded by osdctl; use `--file` for
-file contents. Creating a report writes to the configured backplane-api
-environment, not to the cluster. Check the Backplane URL and proxy config
-before creating test data; report access requires an authorized Backplane role.
+`get` is read-only; omit `--report-id` to retrieve the latest report. Incident
+notes may include a report ID and the matching cluster ID. `--data` accepts
+plain text and is base64-encoded by osdctl; use `--file` for file contents.
+Creating a report writes to the configured backplane-api environment, not to
+the cluster. Check the Backplane URL and proxy config before creating test
+data; report access requires an authorized Backplane role.
 
 ### Hive resync
 
@@ -118,7 +121,7 @@ osdctl servicelog post -C "$CLUSTER_ID" -t template.json --dry-run
 osdctl servicelog post -q "managed='true' and state is 'ready'" -t template.json --dry-run
 ```
 
-Review dry-run output and matched clusters before dropping `--dry-run`.
+Use `-p KEY=VALUE` to fill template placeholders, and confirm the template's stated cause applies before posting. Review dry-run output and matched clusters before dropping `--dry-run`.
 
 ### HCP upgrade
 

@@ -23,6 +23,7 @@
       "test *": "allow",
       "file *": "allow",
       "mktemp *": "allow",
+      "uname *": "allow",
 
       "cd *": "allow",
       "pwd": "allow",
@@ -109,7 +110,7 @@
       "ocm config get *": "allow",
       "ocm whoami": "allow",
       "ocm backplane *": "ask",
-      "ocm backplane status": "ask",
+      "ocm backplane status": "allow",
       "ocm backplane login --readonly *": "allow",
       
       "osdctl org *": "allow",
@@ -117,6 +118,10 @@
       "osdctl cluster context *": "allow",
       "osdctl mc list *": "allow",
       "osdctl version": "allow",
+      "osdctl cluster validate-pull-secret-ext *": "allow",
+      "osdctl cluster pull-secret validate *": "allow",
+      "osdctl servicelog list *": "allow",
+
 
       "rtk *": "allow",
       "rtk oc *": "ask",
@@ -147,12 +152,18 @@
       "acli jira workitem search *": "allow",
       "acli jira workitem comment list *": "allow",
 
+      "aws *": "ask",
+      "aws ssm *": "ask",
+      "aws logs *": "allow",
+
       "gh run list *": "allow",
       "gh run view *": "allow",
       "gh run watch *": "allow",
       "gh pr list *": "allow",
       "gh pr view *": "allow",
       "gh pr diff *": "allow",
+      "gh issue view *": "allow",
+      "gh issue list *": "allow",
       "gh api /repos/*": "allow",
       "gh api repos/*": "allow",
 
@@ -175,6 +186,7 @@
       "go env *": "allow",
       "go doc *": "allow",
       "go list *": "allow",
+      "go tool pprof *": "allow",
       "cargo fmt *": "allow",
       "cargo check *": "allow",
       "cargo test *": "allow",
@@ -197,7 +209,7 @@
       "/usr/local/lib/node_modules/@earendil-works/pi-coding-agent/docs/*": "allow",
       "/~/.local/share/rtk/*": "allow",
 
-      "/incidents/*": "allow",
+      "/incidents*": "allow",
       "/api/*": "allow",
       "/apis/*": "allow"
 
