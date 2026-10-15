@@ -1,12 +1,12 @@
-// Sync EnMaaS GPT model costs in models.json with OpenAI catalog pricing
-// cached in models-store.json. Runs once per session at startup, off the
-// critical path; notifies when prices change and reloads the registry so
-// the new costs are visible without restarting Pi.
+// Sync configured providers' model costs from the cached catalog at session startup.
 import type { ExtensionAPI, ExtensionContext } from "@earendil-works/pi-coding-agent";
 import { chmod, readFile, realpath, rename, stat, unlink, writeFile } from "node:fs/promises";
 import { homedir } from "node:os";
 import { join, resolve } from "node:path";
 import { isDeepStrictEqual } from "node:util";
+
+// Add target/catalog pairs here; model IDs must match exactly.
+const providers = [{ target: "enmaas", catalog: "openai" }];
 
 export default function (pi: ExtensionAPI) {
   pi.on("session_start", (_event, ctx) => {
@@ -25,23 +25,27 @@ async function sync(ctx: ExtensionContext): Promise<void> {
       readFile(join(agentDir, "models-store.json"), "utf8"),
     ]);
     const config = JSON.parse(configText);
-    const openaiModels = JSON.parse(storeText)?.openai?.models;
-    const enmaasModels = config?.providers?.enmaas?.models;
-    if (!Array.isArray(enmaasModels) || !Array.isArray(openaiModels)) return;
-
+    const store = JSON.parse(storeText);
     const updated: string[] = [];
-    for (const model of enmaasModels) {
-      if (typeof model?.id !== "string" || !model.id.startsWith("gpt-")) continue;
-      const catalog = openaiModels.find(
-        (entry) => entry.type === "chat" && entry.id === model.id,
-      );
-      if (!catalog?.cost) {
-        notify(`EnMaaS cost sync: no OpenAI catalog pricing for ${model.id}, left unchanged`, "warning");
-        continue;
-      }
-      if (!isDeepStrictEqual(model.cost, catalog.cost)) {
-        model.cost = catalog.cost;
-        updated.push(model.id);
+    for (const { target, catalog } of providers) {
+      const models = config?.providers?.[target]?.models;
+      const catalogModels = store?.[catalog]?.models;
+      if (!Array.isArray(models) || !Array.isArray(catalogModels)) continue;
+
+      for (const model of models) {
+        if (typeof model?.id !== "string") continue;
+        const match = catalogModels.find(
+          (entry) => entry?.type === "chat" && entry.id === model.id,
+        );
+        if (!match) continue;
+        if (!match.cost) {
+          notify(`Cost sync: no ${catalog} catalog pricing for ${target}/${model.id}, left unchanged`, "warning");
+          continue;
+        }
+        if (!isDeepStrictEqual(model.cost, match.cost)) {
+          model.cost = match.cost;
+          updated.push(`${target}/${model.id}`);
+        }
       }
     }
     if (updated.length === 0) return;
@@ -59,9 +63,9 @@ async function sync(ctx: ExtensionContext): Promise<void> {
     }
 
     await ctx.modelRegistry.refresh({ allowNetwork: false });
-    notify(`EnMaaS pricing synced with the OpenAI catalog: ${updated.join(", ")}`);
+    notify(`Model pricing synced with the catalog: ${updated.join(", ")}`);
   } catch (error) {
     if (error && typeof error === "object" && "code" in error && error.code === "ENOENT") return;
-    notify(`EnMaaS cost sync failed: ${error instanceof Error ? error.message : String(error)}`, "warning");
+    notify(`Model cost sync failed: ${error instanceof Error ? error.message : String(error)}`, "warning");
   }
 }
