@@ -61,6 +61,7 @@
       "sed -i *": "ask",
       "awk *": "allow",
       "awk -i *": "ask",
+      "mktemp *": "allow",
 
       "git *": "ask",
       "git log *": "allow",
@@ -196,18 +197,21 @@
       "make test": "allow",
       "make build": "allow",
       "mage *": "allow"
+
+      "hugo --quiet --destination /tmp/*": "allow",
+      "hugo version": "allow"
     },
     "external_directory": {
       "*": "ask",
       "$HOME/code/*": "allow",
       "$HOME/go/pkg/mod/*": "allow",
-      "~/go/pkg/mod/*": "allow",
+      "$HOME/go/pkg/mod/*": "allow",
       "/tmp/*": "allow",
       "/dev/stdin": "allow",
 
-      "~/.pi/agent/sessions/": "allow",
+      "$HOME/.pi/agent/sessions/": "allow",
       "/usr/local/lib/node_modules/@earendil-works/pi-coding-agent/docs/*": "allow",
-      "/~/.local/share/rtk/*": "allow",
+      "$HOME/.local/share/rtk/*": "allow",
 
       "/incidents*": "allow",
       "/api/*": "allow",
