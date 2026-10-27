@@ -5,9 +5,7 @@
       "*": "allow",
       "*.env": "deny",
       "*.env.*": "deny",
-      "*.env.example": "allow",
-      "~/.ssh/*": "deny",
-      "~/.aws/*": "deny"
+      "*.env.example": "allow"
     },
     "bash": {
       "*": "ask",
@@ -24,6 +22,7 @@
       "file *": "allow",
       "mktemp *": "allow",
       "uname *": "allow",
+      "bash -n *": "allow",
 
       "cd *": "allow",
       "pwd": "allow",
@@ -92,6 +91,7 @@
       "kubectl logs *": "allow",
       "kubectl wait *": "allow",
       "oc *": "ask",
+      "oc project": "allow",
       "oc get *": "allow",
       "oc describe *": "allow",
       "oc list *": "allow",
@@ -122,7 +122,9 @@
       "osdctl cluster validate-pull-secret-ext *": "allow",
       "osdctl cluster pull-secret validate *": "allow",
       "osdctl servicelog list *": "allow",
+      "osdctl cluster reports list *": "allow",
 
+      "rosa describe cluster *": "allow",
 
       "rtk *": "allow",
       "rtk oc *": "ask",
@@ -135,27 +137,53 @@
       "rtk kubectl logs *": "allow",
       "rtk pulumi *": "deny",
 
+      "rtk aws *": "ask",
+      "rtk aws sts get-caller-identity *": "allow",
+      "rtk aws ecr list-images *": "allow",
+      "rtk aws ecr describe*": "allow",
+      "rtk aws iam get*": "allow",
+      "rtk aws iam list*": "allow",
+      "rtk aws ec2 describe*": "allow",
+      "rtk aws ssm describe-instance-information *": "allow",
+      "rtk aws cloudwatch describe*": "allow",
+      "aws *": "ask",
+      "aws sts get-caller-identity *": "allow",
+      "aws iam get-role-policy *": "allow",
+      "aws ssm *": "ask",
+      "aws logs *": "allow",
+      "aws ec2 describe-instances *": "allow",
+      "aws ecr describe-images *": "allow",
+      "aws ecr get-repository-policy *": "allow",
+      "aws ecr get-registry-policy *": "allow",
+      "aws ecr get-lifecycle-policy *": "allow",
+      "aws ecr describe-repositories *": "allow",
+      "aws cloudtrail lookup-events *": "allow",
+
       "pd rest get *": "allow",
       "pd incident log *": "allow",
       "pd incident list *": "allow",
       "pd incident notes *": "ask",
       "pd incident alerts *": "allow",
+      "pd schedule list *": "allow",
+      "pd schedule show *": "allow",
+      "pd service list *": "allow",
+      "pd ep list *": "allow",
 
       "slackcli *": "ask",
       "slackcli auth list *": "allow",
+      "slackcli auth whoami": "allow",
+      "slackcli logs show *": "allow",
       "slackcli search *": "allow",
       "slackcli conversations read *": "allow",
       "slackcli conversations get *": "allow",
+      "slackcli usergroups list *": "allow",
+      "slackcli team info *": "allow",
 
       "acli jira issue view *": "allow",
       "acli jira issue search *": "allow",
       "acli jira workitem view *": "allow",
       "acli jira workitem search *": "allow",
       "acli jira workitem comment list *": "allow",
-
-      "aws *": "ask",
-      "aws ssm *": "ask",
-      "aws logs *": "allow",
 
       "gh run list *": "allow",
       "gh run view *": "allow",
@@ -165,6 +193,8 @@
       "gh pr diff *": "allow",
       "gh issue view *": "allow",
       "gh issue list *": "allow",
+      "gh repo view *": "allow",
+      "gh search *": "allow",
       "gh api /repos/*": "allow",
       "gh api repos/*": "allow",
 
@@ -175,8 +205,11 @@
       "glab api 'projects*": "allow",
       "glab auth status": "allow",
 
+      "terraform fmt *": "allow",
+
       "promtool check *": "allow",
       "pytest *": "allow",
+      "python3 -m unittest discover *": "allow",
       "ruff *": "allow",
       "black *": "allow",
       "prettier *": "allow",
@@ -196,20 +229,27 @@
       "make lint": "allow",
       "make test": "allow",
       "make build": "allow",
-      "mage *": "allow"
+      "mage *": "allow",
+
+      "node -v": "allow",
+      "node --test *": "allow",
 
       "hugo --quiet --destination /tmp/*": "allow",
       "hugo version": "allow"
+
     },
     "external_directory": {
       "*": "ask",
+      "$HOME/.ssh/*": "deny",
+      "$HOME/.aws/*": "deny",
       "$HOME/code/*": "allow",
       "$HOME/go/pkg/mod/*": "allow",
       "$HOME/go/pkg/mod/*": "allow",
       "/tmp/*": "allow",
+      "/host": "allow",
       "/dev/stdin": "allow",
 
-      "$HOME/.pi/agent/sessions/": "allow",
+      "$HOME/.pi/agent/sessions/*": "allow",
       "/usr/local/lib/node_modules/@earendil-works/pi-coding-agent/docs/*": "allow",
       "$HOME/.local/share/rtk/*": "allow",
 

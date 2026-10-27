@@ -1,5 +1,5 @@
 {
-  "lastChangelogVersion": "1.3.0",
+  "lastChangelogVersion": "1.4.0",
   "theme": "dark",
   "defaultProvider": "enmaas",
   "defaultModel": "gpt-6-luna",
@@ -19,10 +19,8 @@
     "enmaas/gpt-6-sol",
     "enmaas/gpt-6-luna",
     "enmaas/gpt-6-astra",
-    "enmaas/rits/zai-org/glm-5-3",
-    "enmaas/gpt-5.6-terra"
-    "openai/gpt-6-sol",
-    "openai/gpt-6-luna"
+    "enmaas/gpt-5.6-terra",
+    "enmaas/rits/zai-org/glm-5-3"
   ],
   "projectPrompts": [
     ".claude/commands"
@@ -35,5 +33,12 @@
   },
   "extensions": [
     "-builtin:mcp"
-  ]
+  ],
+  "subagents": {
+    "agentOverrides": {
+      "reviewer": {
+        "model": "enmaas/gpt-6-sol"
+      }
+    }
+  }
 }

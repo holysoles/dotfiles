@@ -41,7 +41,12 @@ which cluster the current kubeconfig selects before acting:
 ocm backplane status
 ```
 
-For a hosted cluster, `ocm backplane login --manager "${CLUSTER_ID}"` selects its management cluster without parsing `ocm describe cluster` output. `ocm backplane login --service "${CLUSTER_ID}"` selects its service cluster; `--service` also accepts a management cluster ID. Check `ocm backplane status` afterward to confirm the target.
+For a hosted cluster:
+- `ocm backplane login "${CLUSTER_ID}"` logs into it
+- `ocm backplane login --manager "${CLUSTER_ID}"` selects its management cluster without parsing `ocm describe cluster` output.
+- `ocm backplane login --service "${CLUSTER_ID}"` selects its service cluster (ACM hub); `--service` also accepts a management cluster ID.
+
+Check `ocm backplane status` afterward to confirm the target.
 
 ### Backplane elevated access
 
@@ -139,6 +144,26 @@ eval "$(osdctl account cli -i "${AWS_ACCOUNT_ID}" -r "${REGION}" -o env)"
 aws sts get-caller-identity
 ```
 
+### Stale ROSA VPC cleanup
+
+Use the cleanup helper to remove stale, cluster-tagged VPC networking after confirming
+that the ROSA cluster is deprovisioned. It scans the current AWS account and opted-in
+regions; `all` means all discoverable ROSA-tagged VPCs, not every VPC in the account.
+It skips clusters present in the currently configured OCM environment. Run the dry-run
+first and review the VPCs/account before applying:
+
+```sh
+scripts/cleanup-cluster-aws-resources.sh <cluster-id|cluster-name|all>
+scripts/cleanup-cluster-aws-resources.sh <cluster-id|cluster-name|all> --apply
+```
+
+The script requires AWS credentials for the target account and an authenticated OCM
+session for the matching environment. `--apply` requires typing the exact account/VPC
+count confirmation. It handles dedicated network stacks and VPC dependencies only;
+unsupported resources (for example instances, unknown ENIs, peering, or transit-gateway
+attachments) cause it to stop for manual review. It does not sweep IAM, S3, ACM, or
+other non-network resources.
+
 ### Cluster Resources
 
 ```sh
@@ -195,6 +220,7 @@ ocm list quota -c mycluster  # quota consumed by a cluster
 ocm list region              # available cloud provider regions
 ocm list versions            # supported OCP versions (default: stable channel)
 ocm list versions --channel-group candidate
+# Channel groups: stable (default), candidate, fast, eus, nightly
 ```
 
 ### Hibernate / Resume

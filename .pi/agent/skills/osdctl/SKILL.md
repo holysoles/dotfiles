@@ -101,7 +101,11 @@ notes may include a report ID and the matching cluster ID. `--data` accepts
 plain text and is base64-encoded by osdctl; use `--file` for file contents.
 Creating a report writes to the configured backplane-api environment, not to
 the cluster. Check the Backplane URL and proxy config before creating test
-data; report access requires an authorized Backplane role.
+data; report access requires an authorized Backplane role. Reports persist, and
+osdctl has no report-delete command, so use a test cluster for test data.
+
+`OCM_URL=staging` selects staging OCM; `BACKPLANE_URL` explicitly selects the
+staging Backplane API.
 
 ### Hive resync
 

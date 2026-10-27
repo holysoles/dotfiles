@@ -79,6 +79,29 @@ slackcli search people 'person@example.com'
 Search pagination uses `--page`; keep `--limit` bounded and fetch another page only
 when needed.
 
+### Choose a review group from a GitHub `OWNERS` file
+
+When asked which Slack group to ping for a repository review:
+
+1. Read the repository's `OWNERS` file and note its reviewers and approvers.
+2. Search each candidate group handle without wrapping it in quotes, keeping results bounded:
+
+   ```sh
+   slackcli search messages "@group-handle" --limit 20 --json --fields text,channel.name,permalink,ts
+   ```
+
+3. Check that results show the candidate being tagged in relevant review requests, ideally for the same repository or project. Search results may show the tag as a Slack group ID (for example, `<@S...>`), not its handle.
+4. Read membership by that ID and compare members with the OWNERS names:
+
+   ```sh
+   slackcli usergroups read S... --json
+   ```
+
+   `usergroups list` may return no groups, and reading by handle may fail even when message search finds group mentions. Use the ID from a relevant tagged message when available. Reading by ID confirms membership, but may only return the ID as the group name and does not establish the group's owning workspace.
+5. Recommend the group with the strongest combination of OWNERS overlap and relevant review usage. Cite a representative message permalink and note any mismatch; don't treat a group name or search-result count alone as proof.
+
+For a full directory or authoritative group name/ownership, use Slack's user-group directory/admin view or list groups with the group's owning member-workspace ID (`--team <T...>`). A message's workspace ID does not necessarily identify the group-owning workspace. Slack and GitHub usernames may differ, so match cautiously. If there is no reliable ID-to-membership evidence, say so rather than guessing.
+
 ## Write operations
 
 Run these only after the user explicitly asks to modify Slack:
