@@ -1,7 +1,7 @@
 {
   "lastChangelogVersion": "1.4.0",
   "theme": "dark",
-  "defaultProvider": "enmaas",
+  "defaultProvider": "fallback",
   "defaultModel": "gpt-6-luna",
   "defaultThinkingLevel": "medium",
   "hideThinkingBlock": true,
@@ -16,10 +16,10 @@
     "npm:pi-context-view"
   ],
   "enabledModels": [
-    "enmaas/gpt-6-sol",
-    "enmaas/gpt-6-luna",
-    "enmaas/gpt-6-astra",
-    "enmaas/gpt-5.6-terra",
+    "fallback/gpt-6-sol",
+    "fallback/gpt-6-luna",
+    "fallback/gpt-6-astra",
+    "fallback/gpt-5.6-terra",
     "enmaas/rits/zai-org/glm-5-3"
   ],
   "projectPrompts": [
@@ -37,7 +37,7 @@
   "subagents": {
     "agentOverrides": {
       "reviewer": {
-        "model": "enmaas/gpt-6-sol"
+        "model": "fallback/gpt-6-sol"
       }
     }
   }

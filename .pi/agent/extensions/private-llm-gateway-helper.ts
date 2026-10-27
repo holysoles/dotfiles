@@ -1,4 +1,4 @@
-// Sync configured providers' model costs from the cached catalog at session startup.
+// Sync model costs and route matching EnMaaS models to OpenAI on failure.
 import type { ExtensionAPI, ExtensionContext } from "@earendil-works/pi-coding-agent";
 import { chmod, readFile, realpath, rename, stat, unlink, writeFile } from "node:fs/promises";
 import { homedir } from "node:os";
@@ -7,8 +7,30 @@ import { isDeepStrictEqual } from "node:util";
 
 // Add target/catalog pairs here; model IDs must match exactly.
 const providers = [{ target: "enmaas", catalog: "openai" }];
+const fallbackModels = ["gpt-6-sol", "gpt-6-luna", "gpt-6-astra", "gpt-5.6-terra"];
 
 export default function (pi: ExtensionAPI) {
+  for (const id of fallbackModels) {
+    pi.registerVirtualModel<boolean>({
+      provider: "fallback",
+      id,
+      name: `${id} (EnMaaS → OpenAI)`,
+      thinkingLevels: ["off", "minimal", "low", "medium", "high", "xhigh"],
+      contextWindow: 272000,
+      maxTokens: 128000,
+      route(request, ctx) {
+        const downstream = ctx.modelRegistry.find("enmaas", id);
+        const upstream = ctx.modelRegistry.find("openai", id);
+        // shortcut: compaction retries also switch providers; distinguish overflow if it becomes a problem.
+        const failedDownstream = request.reason === "retry" && request.failed?.model.provider === "enmaas";
+        const useUpstream = request.state === true || (failedDownstream && !!upstream && ctx.modelRegistry.hasConfiguredAuth(upstream)) ||
+          (!downstream || !ctx.modelRegistry.hasConfiguredAuth(downstream));
+        const model = useUpstream ? upstream : downstream;
+        if (!model) throw new Error(`No available model for ${id}`);
+        return { model, thinkingLevel: request.thinkingLevel, state: useUpstream || undefined };
+      },
+    });
+  }
   pi.on("session_start", (_event, ctx) => {
     void sync(ctx);
   });
