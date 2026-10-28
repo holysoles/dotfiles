@@ -4,6 +4,7 @@ import { chmod, readFile, realpath, rename, stat, unlink, writeFile } from "node
 import { homedir } from "node:os";
 import { join, resolve } from "node:path";
 import { isDeepStrictEqual } from "node:util";
+import { chooseFallbackRoute } from "./fallback-model-routing.mjs";
 
 // Add target/catalog pairs here; model IDs must match exactly.
 const providers = [{ target: "enmaas", catalog: "openai" }];
@@ -23,11 +24,10 @@ export default function (pi: ExtensionAPI) {
         const upstream = ctx.modelRegistry.find("openai", id);
         // shortcut: compaction retries also switch providers; distinguish overflow if it becomes a problem.
         const failedDownstream = request.reason === "retry" && request.failed?.model.provider === "enmaas";
-        const useUpstream = request.state === true || (failedDownstream && !!upstream && ctx.modelRegistry.hasConfiguredAuth(upstream)) ||
-          (!downstream || !ctx.modelRegistry.hasConfiguredAuth(downstream));
-        const model = useUpstream ? upstream : downstream;
-        if (!model) throw new Error(`No available model for ${id}`);
-        return { model, thinkingLevel: request.thinkingLevel, state: useUpstream || undefined };
+        const preferUpstream = request.state === true ||
+          (failedDownstream && !!upstream && ctx.modelRegistry.hasConfiguredAuth(upstream));
+        const route = chooseFallbackRoute(id, ctx, preferUpstream);
+        return { ...route, thinkingLevel: request.thinkingLevel };
       },
     });
   }

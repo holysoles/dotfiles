@@ -4,6 +4,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { test } from "node:test";
 import factory from "../private-llm-gateway-helper.ts";
+import { resolveFallbackModel } from "../fallback-model-routing.mjs";
 
 test("syncs matching chat models and leaves unrelated models alone", async () => {
   const dir = await mkdtemp(join(tmpdir(), "pi-cost-sync-"));
@@ -81,12 +82,14 @@ test("fallback routes EnMaaS first, then keeps OpenAI after a failed request", (
   } };
   const route = routes.get(id).route;
   const request = { reason: "user", thinkingLevel: "high" };
+  assert.equal(resolveFallbackModel(id, ctx), downstream);
   assert.deepEqual(route(request, ctx), { model: downstream, thinkingLevel: "high", state: undefined });
   const retry = route({ ...request, reason: "retry", failed: { model: downstream } }, ctx);
   assert.deepEqual(retry, { model: upstream, thinkingLevel: "high", state: true });
   assert.equal(route({ ...request, reason: "continuation", state: retry.state }, ctx).model, upstream);
   assert.equal(route({ ...request, state: retry.state }, ctx).model, upstream);
   enmaasAuth = false;
+  assert.equal(resolveFallbackModel(id, ctx), upstream);
   assert.equal(route(request, ctx).model, upstream);
   enmaasAuth = true;
   openaiAuth = false;

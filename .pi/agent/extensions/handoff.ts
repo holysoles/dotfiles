@@ -26,6 +26,7 @@ import { mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { Text, type TUI } from "@earendil-works/pi-tui";
+import { resolveFallbackModel } from "./fallback-model-routing.mjs";
 
 const SUMMARY_REQUEST = `Summarize this session for handoff to a new session. Output only the summary, no preamble. Use exactly this format:
 
@@ -143,6 +144,15 @@ export default function (pi: ExtensionAPI) {
 				ctx.ui.notify("No model selected", "error");
 				return;
 			}
+			let completionModel = model;
+			if (model.api === "pi-virtual" && model.provider === "fallback") {
+				try {
+					completionModel = resolveFallbackModel(model.id, ctx);
+				} catch (err) {
+					ctx.ui.notify(`Handoff failed: ${String(err)}`, "error");
+					return;
+				}
+			}
 
 			// --- Step 1: Parse and validate optional model arg ---
 			const modelArg = args.trim();
@@ -174,6 +184,7 @@ export default function (pi: ExtensionAPI) {
 			const currentSessionFile = ctx.sessionManager.getSessionFile();
 
 			// --- Step 3: Generate a hidden summary with only a spinner in the TUI ---
+			let generationError: string | undefined;
 			const summary = await ctx.ui.custom<string | null>(
 				(tui, theme, _keybindings, done) => {
 					const loader = new BorderedLoader(
@@ -189,7 +200,7 @@ export default function (pi: ExtensionAPI) {
 					};
 					void ctx.modelRegistry
 						.complete(
-							model,
+							completionModel,
 							{
 								systemPrompt: ctx.getSystemPrompt(),
 								messages: [...convertToLlm(getHandoffMessages(branch)), summaryRequest],
@@ -201,13 +212,21 @@ export default function (pi: ExtensionAPI) {
 								done(null);
 								return;
 							}
+							if (response.stopReason === "error") {
+								generationError = response.errorMessage ?? "Model request failed";
+								done(null);
+								return;
+							}
 							const text = response.content
 								.flatMap((content) => (content.type === "text" ? [content.text] : []))
 								.join("\n")
 								.trim();
 							done(text || null);
 						})
-						.catch(() => done(null));
+						.catch((err) => {
+							generationError = String(err);
+							done(null);
+						});
 					return loader;
 				},
 			);
@@ -215,8 +234,12 @@ export default function (pi: ExtensionAPI) {
 			// --- Step 4: Handle cancellation or empty summary ---
 			if (!summary?.trim()) {
 				ctx.ui.notify(
-					summary === null ? "Handoff cancelled" : "Handoff failed: empty summary",
-					summary === null ? "info" : "error",
+					generationError
+						? `Handoff failed: ${generationError}`
+						: summary === null
+							? "Handoff cancelled"
+							: "Handoff failed: empty summary",
+					generationError || summary !== null ? "error" : "info",
 				);
 				return;
 			}
