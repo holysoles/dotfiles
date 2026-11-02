@@ -110,7 +110,6 @@ alias k='kubectl'
 alias ksw='kubectl config use-context'
 alias watchh='watch '
 alias flushdns='sudo resolvectl flush-caches'
-alias import-ovpn='nmcli connection import type openvpn file'
 if command -v bat > /dev/null; then
     alias cat='bat'
 elif command -v batcat > /dev/null; then
@@ -139,6 +138,44 @@ function mkcd() {
 }
 function find-dupes() {
     find . ! -empty -type f -exec md5sum {} + | sort | uniq -w32 -dD
+}
+import-ovpn() {
+  if [[ $# -lt 1 || $# -gt 2 ]]; then
+    echo 'Usage: import-ovpn <file.ovpn> [split-dns-domain]' >&2
+    return 2
+  fi
+
+  local domain=${2:-} dns result uuid
+
+  # An explicit domain overrides the one embedded in the profile.
+  if [[ $# -eq 1 ]]; then
+    domain=$(awk '$1 == "dhcp-option" && $2 == "DOMAIN-ROUTE" { print $3; exit }' "$1")
+  fi
+
+  if [[ -n $domain ]]; then
+    dns=$(awk '$1 == "dhcp-option" && $2 == "DNS" { print $3; exit }' "$1")
+    if [[ -z $dns ]]; then
+      echo "No dhcp-option DNS in $1" >&2
+      return 1
+    fi
+  fi
+
+  result=$(nmcli -c no connection import type openvpn file "$1") || return
+  printf '%s\n' "$result"
+
+  # Profiles without a domain retain the ordinary import behavior.
+  [[ -n $domain ]] || return 0
+
+  uuid=$(grep -oEm1 '[[:xdigit:]]{8}(-[[:xdigit:]]{4}){3}-[[:xdigit:]]{12}' <<< "$result") || {
+    echo "Could not identify imported connection UUID" >&2
+    return 1
+  }
+
+  nmcli connection modify uuid "$uuid" \
+    ipv4.dns "$dns" \
+    ipv4.dns-search "~$domain" \
+    ipv4.ignore-auto-dns yes \
+    ipv4.never-default yes
 }
 function flux-retry-helm() {
   local NAMESPACE="$1"

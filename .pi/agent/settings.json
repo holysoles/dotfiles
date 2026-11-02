@@ -35,9 +35,15 @@
     "-builtin:mcp"
   ],
   "subagents": {
+    "defaultSubagentOnlyExtensions": [
+       "~/.pi/agent/extensions/private-llm-gateway-helper.ts"
+     ],
     "agentOverrides": {
       "reviewer": {
         "model": "fallback/gpt-6-sol"
+      },
+      "worker": {
+        "model": "fallback/gpt-6-luna"
       }
     }
   }

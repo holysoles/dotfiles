@@ -1,0 +1,9 @@
+{
+	"executionMode": "automatic",
+	"phases": {
+		"executing": {
+			"activeTools": ["subagent"],
+			"instructions": "[PLANNOTATOR - EXECUTING PLAN]\nThe planning phase is over: the plan has been approved and planning-phase restrictions no longer apply. This supersedes every earlier Plannotator instruction in this conversation, including the planning-phase rules above. Full tool access is enabled. Execute the plan from ${planFilePath}.\n\nRemaining steps:\n${todoList}\n\nExecute each remaining step in order, using a unique worker subagent for each step. Call plannotator_mark_done immediately after each completed step and before the next step. [DONE:n] markers remain a fallback for interrupted executions. Updated todo status arrives in the conversation as steps are completed."
+		}
+	}
+}

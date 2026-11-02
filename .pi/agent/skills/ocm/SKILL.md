@@ -127,6 +127,25 @@ ocm describe cluster --json mycluster | jq '.state'
 ocm cluster status mycluster
 ```
 
+#### Zero-egress ROSA HCP clusters
+
+The Clusters API exposes the zero-egress marker as the string
+`.properties.zero_egress == "true"` (not a top-level field or boolean). It is
+not a valid server-side `search` field, so filter the returned items with `jq`.
+For example, query ready ROSA HCP clusters in production and print cluster name,
+ID, and OCP version:
+
+```sh
+OCM_URL=https://api.openshift.com ocm get /api/clusters_mgmt/v1/clusters \
+  -p "search=state='ready' and product.id='rosa' and hypershift.enabled='true'" \
+  -p size=3000 |
+  jq -r '.items[] | select(.properties.zero_egress == "true") |
+    [.name, .id, .version.raw_id] | @tsv' | sort
+```
+
+Adjust the requested size and paginate if the filtered cluster set exceeds it.
+`version.raw_id` gives the plain OCP version (for example, `4.20.17`).
+
 ### Management-cluster AWS access
 
 `ocm backplane cloud credentials` may not have the
