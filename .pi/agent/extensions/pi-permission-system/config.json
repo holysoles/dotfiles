@@ -64,6 +64,8 @@
       "awk *": "allow",
       "awk -i *": "ask",
       "mktemp *": "allow",
+      "readelf *": "allow",
+      "bash -n *": "allow",
 
       "pi --help": "allow",
 
