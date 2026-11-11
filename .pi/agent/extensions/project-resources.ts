@@ -2,7 +2,7 @@
 // Adds the ability to specify additional project level paths to load skills and prompts from.
 // Useful for remapping skills/commands from claude directories.
 //
-import { readFile, access } from "node:fs/promises";
+import { readFile, access, realpath } from "node:fs/promises";
 import { join, resolve } from "node:path";
 import { homedir } from "node:os";
 import type { ExtensionAPI } from "@earendil-works/pi-coding-agent";
@@ -27,9 +27,20 @@ export default async function (pi: ExtensionAPI) {
     const exists = (p: string) => access(p).then(() => true, () => false);
     const resolve_ = (rel: string) => resolve(event.cwd, rel);
 
-    const skillPaths = (
-      await Promise.all(projectSkills.map(resolve_).map(async (p) => (await exists(p) ? p : null)))
-    ).filter(Boolean) as string[];
+    const piSkillsPath = await realpath(resolve(event.cwd, ".pi/skills")).catch(() => undefined);
+    const seenSkillPaths = new Set(piSkillsPath ? [piSkillsPath] : []);
+    const skillPaths: string[] = [];
+    for (const path of projectSkills.map(resolve_)) {
+      try {
+        const target = await realpath(path);
+        if (!seenSkillPaths.has(target)) {
+          seenSkillPaths.add(target);
+          skillPaths.push(path);
+        }
+      } catch {
+        // Missing or inaccessible configured paths are skipped, as before.
+      }
+    }
 
     const promptPaths = (
       await Promise.all(projectPrompts.map(resolve_).map(async (p) => (await exists(p) ? p : null)))
