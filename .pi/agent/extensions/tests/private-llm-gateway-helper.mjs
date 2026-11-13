@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
+import { mkdtemp, mkdir, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { test } from "node:test";
@@ -64,7 +64,53 @@ test("syncs matching chat models and leaves unrelated models alone", async () =>
   }
 });
 
-test("fallback routes EnMaaS first, then keeps OpenAI after a failed request", () => {
+test("sync preserves edits made while another session holds the model config lock", async () => {
+  const dir = await mkdtemp(join(tmpdir(), "pi-cost-sync-lock-"));
+  const previous = process.env.PI_CODING_AGENT_DIR;
+  process.env.PI_CODING_AGENT_DIR = dir;
+  const lock = join(dir, "models.json.lock");
+  try {
+    const config = { providers: { enmaas: { models: [{ id: "gpt-6-luna", cost: { input: 99 } }] } } };
+    await writeFile(join(dir, "models.json"), JSON.stringify(config));
+    await writeFile(join(dir, "models-store.json"), JSON.stringify({ openai: { models: [
+      { id: "gpt-6-luna", type: "chat", cost: { input: 1 } },
+    ] } }));
+    await mkdir(lock);
+    await writeFile(join(lock, "owner"), `${process.pid}:another-session`);
+    let handler;
+    factory({ on: (_event, fn) => { handler = fn; }, registerVirtualModel: () => {} });
+    let done;
+    let completed = false;
+    const synced = new Promise((resolve) => { done = resolve; });
+    handler({}, { ui: { notify: (_message, type) => { if (type === "info") { completed = true; done(); } } },
+      modelRegistry: { refresh: async () => {} } });
+    await new Promise((resolve) => setTimeout(resolve, 60));
+    assert.equal(completed, false);
+    config.providers.enmaas.models.push({ id: "user-added", cost: { input: 7 } });
+    await writeFile(join(dir, "models.json"), JSON.stringify(config));
+    await rm(lock, { recursive: true });
+    let timer;
+    try {
+      await Promise.race([synced, new Promise((_, reject) => {
+        timer = setTimeout(() => reject(new Error("sync timed out")), 2000);
+      })]);
+    } finally {
+      clearTimeout(timer);
+    }
+    const result = JSON.parse(await readFile(join(dir, "models.json"), "utf8"));
+    assert.deepEqual(result.providers.enmaas.models.map(({ id, cost }) => ({ id, cost })), [
+      { id: "gpt-6-luna", cost: { input: 1 } },
+      { id: "user-added", cost: { input: 7 } },
+    ]);
+    await assert.rejects(readFile(lock), { code: "ENOENT" });
+  } finally {
+    if (previous === undefined) delete process.env.PI_CODING_AGENT_DIR;
+    else process.env.PI_CODING_AGENT_DIR = previous;
+    await rm(dir, { recursive: true, force: true });
+  }
+});
+
+test("fallback routes EnMaaS retries to OpenAI and stays there after its failure", () => {
   const routes = new Map();
   factory({
     on: () => {},
@@ -73,7 +119,7 @@ test("fallback routes EnMaaS first, then keeps OpenAI after a failed request", (
   assert.deepEqual([...routes.keys()], ["gpt-6-sol", "gpt-6-luna", "gpt-6-astra", "gpt-5.6-terra"]);
   const id = "gpt-6-luna";
   const downstream = { provider: "enmaas", id };
-  const upstream = { provider: "openai", id };
+  let upstream = { provider: "openai", id };
   let enmaasAuth = true;
   let openaiAuth = true;
   const ctx = { modelRegistry: {
@@ -84,14 +130,22 @@ test("fallback routes EnMaaS first, then keeps OpenAI after a failed request", (
   const request = { reason: "user", thinkingLevel: "high" };
   assert.equal(resolveFallbackModel(id, ctx), downstream);
   assert.deepEqual(route(request, ctx), { model: downstream, thinkingLevel: "high", state: undefined });
-  const retry = route({ ...request, reason: "retry", failed: { model: downstream } }, ctx);
+  // A retry after context-overflow compaction has the same route reason.
+  const retry = route({ ...request, reason: "retry", failed: { model: downstream,
+    message: { stopReason: "error", errorMessage: "context overflow" } } }, ctx);
   assert.deepEqual(retry, { model: upstream, thinkingLevel: "high", state: true });
   assert.equal(route({ ...request, reason: "continuation", state: retry.state }, ctx).model, upstream);
   assert.equal(route({ ...request, state: retry.state }, ctx).model, upstream);
+  assert.deepEqual(route({ ...request, reason: "retry", failed: { model: upstream }, state: retry.state }, ctx),
+    { model: upstream, thinkingLevel: "high", state: true });
   enmaasAuth = false;
   assert.equal(resolveFallbackModel(id, ctx), upstream);
   assert.equal(route(request, ctx).model, upstream);
   enmaasAuth = true;
   openaiAuth = false;
   assert.equal(route({ ...request, reason: "retry", failed: { model: downstream } }, ctx).model, downstream);
+  upstream = undefined;
+  assert.equal(route({ ...request, reason: "retry", failed: { model: downstream } }, ctx).model, downstream);
+  enmaasAuth = false;
+  assert.throws(() => route(request, ctx), /No available model for gpt-6-luna/);
 });
