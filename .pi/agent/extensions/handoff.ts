@@ -26,7 +26,10 @@ import { mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { Text, type TUI } from "@earendil-works/pi-tui";
-import { resolveFallbackModel } from "./fallback-model-routing.mjs";
+import {
+	parsePrivateLlmGatewaySettings,
+	resolveFallbackModel,
+} from "../npm/node_modules/@holysoles/pi-packages/extensions/private-llm-gateway/fallback-model-routing.mjs";
 
 const SUMMARY_REQUEST = `Summarize this session for handoff to a new session. Output only the summary, no preamble. Use exactly this format:
 
@@ -147,7 +150,19 @@ export default function (pi: ExtensionAPI) {
 			let completionModel = model;
 			if (model.api === "pi-virtual" && model.provider === "fallback") {
 				try {
-					completionModel = resolveFallbackModel(model.id, ctx);
+					const globalSettings = SettingsManager.create(ctx.cwd, getAgentDir(), {
+						projectTrusted: ctx.isProjectTrusted(),
+					}).getGlobalSettings();
+					const gatewaySettings = parsePrivateLlmGatewaySettings(globalSettings);
+					if (!gatewaySettings) {
+						throw new Error("Private LLM gateway settings are missing or invalid");
+					}
+					completionModel = resolveFallbackModel(
+						model.id,
+						ctx,
+						gatewaySettings.models,
+						gatewaySettings.publicModelFailover,
+					);
 				} catch (err) {
 					ctx.ui.notify(`Handoff failed: ${String(err)}`, "error");
 					return;

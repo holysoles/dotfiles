@@ -13,7 +13,8 @@
     "npm:pi-subagents",
     "npm:@gotgenes/pi-permission-system",
     "npm:pi-lens",
-    "npm:pi-context-view"
+    "npm:pi-context-view",
+    "npm:@holysoles/pi-packages"
   ],
   "enabledModels": [
     "fallback/gpt-6-sol",
@@ -36,14 +37,58 @@
   ],
   "subagents": {
     "defaultSubagentOnlyExtensions": [
-       "~/.pi/agent/extensions/private-llm-gateway-helper.ts"
-     ],
+      "npm:@holysoles/pi-packages"
+    ],
     "agentOverrides": {
       "reviewer": {
         "model": "fallback/gpt-6-sol"
       },
       "worker": {
         "model": "fallback/gpt-6-luna"
+      }
+    }
+  },
+  "privateLlmGateway": {
+    "models": {
+      "gpt-6-sol": {
+        "private": {
+          "provider": "enmaas",
+          "id": "gpt-6-sol"
+        },
+        "public": {
+          "provider": "openai",
+          "id": "gpt-6-sol"
+        }
+      },
+      "gpt-6-luna": {
+        "private": {
+          "provider": "enmaas",
+          "id": "gpt-6-luna"
+        },
+        "public": {
+          "provider": "openai",
+          "id": "gpt-6-luna"
+        }
+      },
+      "gpt-6-astra": {
+        "private": {
+          "provider": "enmaas",
+          "id": "gpt-6-astra"
+        },
+        "public": {
+          "provider": "openai",
+          "id": "gpt-6-astra"
+        }
+      },
+      "gpt-5.6-terra": {
+        "private": {
+          "provider": "enmaas",
+          "id": "gpt-5.6-terra"
+        },
+        "public": {
+          "provider": "openai",
+          "id": "gpt-5.6-terra"
+        }
       }
     }
   }
