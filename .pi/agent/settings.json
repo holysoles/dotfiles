@@ -1,5 +1,5 @@
 {
-  "lastChangelogVersion": "1.4.0",
+  "lastChangelogVersion": "1.5.2",
   "theme": "dark",
   "defaultProvider": "fallback",
   "defaultModel": "gpt-6-luna",
@@ -14,7 +14,8 @@
     "npm:@gotgenes/pi-permission-system",
     "npm:pi-lens",
     "npm:pi-context-view",
-    "npm:@holysoles/pi-packages"
+    "npm:@holysoles/pi-gatewayhelper",
+    "npm:@holysoles/pi-handoff"
   ],
   "enabledModels": [
     "fallback/gpt-6-sol",
@@ -37,7 +38,7 @@
   ],
   "subagents": {
     "defaultSubagentOnlyExtensions": [
-      "npm:@holysoles/pi-packages"
+      "npm:holysoles/pi-gatewayhelper"
     ],
     "agentOverrides": {
       "reviewer": {
@@ -91,5 +92,12 @@
         }
       }
     }
+  },
+  "extensionChangelogVersions": {
+    "{\"source\":\"npm:pi-mcp-adapter\",\"scope\":\"user\"}": "7.0.1",
+    "{\"source\":\"npm:pi-subagents\",\"scope\":\"user\"}": "0.88.1",
+    "{\"source\":\"npm:@gotgenes/pi-permission-system\",\"scope\":\"user\"}": "42.0.2",
+    "{\"source\":\"npm:pi-lens\",\"scope\":\"user\"}": "4.5.1",
+    "{\"source\":\"npm:pi-context-view\",\"scope\":\"user\"}": "0.8.4"
   }
 }
