@@ -38,7 +38,7 @@
   ],
   "subagents": {
     "defaultSubagentOnlyExtensions": [
-      "npm:holysoles/pi-gatewayhelper"
+      "~/.pi/agent/npm/node_modules/@holysoles/pi-gatewayhelper/index.ts"
     ],
     "agentOverrides": {
       "reviewer": {

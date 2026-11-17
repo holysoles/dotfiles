@@ -11,15 +11,16 @@ Use `rosa` for ROSA and ROSA HCP operations through the supported ROSA/OCM API.
 
 ## Login
 
-Use the `rosa-login` helper to choose an AWS login flow. In a terminal, run it without selection flags to keep the menus:
+Use the `rosa-login` helper to choose an AWS login flow. In a terminal, run:
 
 ```bash
-rosa-login stage # or int / prod
+rosa-login stage # or int / prod; defaults to console login
+source ~/.local/bin/rosa-login stage # defaults to CLI login in this shell
 ```
 
-The script runs `rh-aws-saml-login` for the selected payer first (`osd-staging-2` for int/stage, `rh-control` for prod; override with the payer-account argument or `--payer-account`). Menu choices: 1 uses the account ID and credentials returned by that SAML login directly for CLI access (no `osdctl account cli`); 2 selects the first account associated with the Kerberos user; 3 prompts for an account ID. Then choose CLI or console access. Console access still uses `osdctl account console`.
+The script runs `rh-aws-saml-login` for the selected payer first (`osd-staging-2` for int/stage, `rh-control` for prod; override with the payer-account argument or `--payer-account`). Account choices: 1 uses the account ID and credentials returned by that SAML login directly for CLI access (no `osdctl account cli`); 2 selects the first account associated with the Kerberos user; 3 prompts for an account ID. Running it normally defaults to console login; sourcing it defaults to CLI login so credentials are exported into the current shell. Adding `--` and a command also defaults to CLI login and runs that command with the selected credentials. Override either default with `--login-method cli|console`. Console access uses `osdctl account console`.
 
-For non-interactive `osdctl` use, provide the account and method and use existing OCM credentials:
+For non-interactive CLI login, provide the account and use existing OCM credentials:
 
 ```bash
 rosa-login stage --account-id 123456789012 --login-method cli --skip-ocm-login
@@ -31,11 +32,11 @@ AWS credentials exported by the `osdctl` flow do not persist in the parent shell
 
 ```bash
 rosa-login int osd-staging-1 --account-id 123456789012 \
-  --login-method cli --skip-ocm-login -- \
+  --skip-ocm-login -- \
   aws ssm start-session --region us-east-1 --target <instance-id>
 ```
 
-The command form requires `--login-method cli`. Confirm the instance belongs to the selected account; this does not grant missing SSM permissions.
+The `--` command form defaults to CLI login. Confirm the instance belongs to the selected account; this does not grant missing SSM permissions.
 
 ## Safe workflow
 
@@ -71,6 +72,8 @@ rosa delete image-mirror --cluster=<cluster> <mirror-id>
 - A ROSA API mutation requires appropriate OCM authorization. Backplane elevation is temporary Kubernetes access to the selected cluster; it does not grant ROSA/OCM API permissions or bypass admission policies.
 
 ## Cluster and access operations
+
+For the personal staging HCP provisioning sequence (login, VPC/subnets, OIDC/account roles, cluster creation, and backplane access), see [staging-hcp-provisioning.md](staging-hcp-provisioning.md). **Zero-egress deployment is different** (private-only Terraform networking and additional IAM/access steps): see the [zero-egress skill](../zero-egress/SKILL.md) and its [stage/int/prod deployment workflow](../zero-egress/zero-egress-hcp-deployment.md).
 
 Useful read-only discovery:
 
