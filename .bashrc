@@ -119,6 +119,7 @@ fi
 if [ "$WORK" == "true" ]; then
     alias occ='osdctl cluster context -C'
     alias ocmb='ocm-backplane'
+    alias ocmbe='ocm-backplane elevate -n --'
     alias ocmc="ocm-container"
 else
     alias oclaude='ollama launch claude --'
