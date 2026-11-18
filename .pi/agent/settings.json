@@ -4,12 +4,14 @@
   "defaultProvider": "fallback",
   "defaultModel": "gpt-6-luna",
   "defaultThinkingLevel": "medium",
+  "defaultTools": [
+    "+codemode"
+  ],
   "hideThinkingBlock": true,
   "showCacheMissNotices": true,
   "packages": [
     "npm:@plannotator/pi-extension",
     "npm:@dietrichgebert/ponytail",
-    "npm:pi-mcp-adapter",
     "npm:pi-subagents",
     "npm:@gotgenes/pi-permission-system",
     "npm:pi-lens",
@@ -42,6 +44,9 @@
     ],
     "agentOverrides": {
       "reviewer": {
+        "model": "fallback/gpt-6-sol"
+      },
+      "oracle": {
         "model": "fallback/gpt-6-sol"
       },
       "worker": {
@@ -94,9 +99,8 @@
     }
   },
   "extensionChangelogVersions": {
-    "{\"source\":\"npm:pi-mcp-adapter\",\"scope\":\"user\"}": "7.0.1",
-    "{\"source\":\"npm:pi-subagents\",\"scope\":\"user\"}": "0.88.1",
-    "{\"source\":\"npm:@gotgenes/pi-permission-system\",\"scope\":\"user\"}": "42.0.2",
+    "{\"source\":\"npm:pi-subagents\",\"scope\":\"user\"}": "0.89.0",
+    "{\"source\":\"npm:@gotgenes/pi-permission-system\",\"scope\":\"user\"}": "42.1.0",
     "{\"source\":\"npm:pi-lens\",\"scope\":\"user\"}": "4.5.1",
     "{\"source\":\"npm:pi-context-view\",\"scope\":\"user\"}": "0.8.4"
   }
