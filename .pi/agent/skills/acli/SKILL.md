@@ -32,8 +32,12 @@ and `acli jira workitem link create --help` before writing. `create --generate-j
 (Atlassian Document Format), and optional `additionalAttributes`. For ROSAENG,
 set the team with `"additionalAttributes":{"customfield_10001":"<team-id>"}`;
 look up the ID from a verified ticket on the requested team, rather than
-hardcoding it. `--description-file` also accepts plain text or ADF. Create once;
-retain the returned `.key` and don't retry blindly after a response failure.
+hardcoding it. `--description-file` also accepts plain text or ADF. When creating
+a Task under an Epic via `--from-json`, set `parentIssueId` to the parent issue
+key (for example, `"ROSAENG-12345"`); the numeric Jira issue ID was rejected as
+an invalid parent in testing. Verify the created issue's `.fields.parent.key`,
+type, and team. Create once; retain the returned `.key` and don't retry blindly
+after a response failure.
 
 ```sh
 acli jira workitem create --from-json file.json --json | jq '{key, status:.fields.status.name, team:.fields.customfield_10001.name}'

@@ -215,6 +215,7 @@
       "slackcli team info *": "allow",
       "slackcli user info *": "allow",
 
+      "acli * --help": "allow",
       "acli jira issue view *": "allow",
       "acli jira issue search *": "allow",
       "acli jira workitem view *": "allow",
@@ -306,7 +307,7 @@
       "$HOME/code/*": "allow",
       "~/code/*": "allow",
       "$HOME/go/pkg/mod/*": "allow",
-      "/tmp/*": "allow",
+      "/tmp": "allow",
       "/host": "allow",
       "/dev/stdin": "allow",
 
