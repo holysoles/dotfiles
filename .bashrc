@@ -94,6 +94,7 @@ fi
 alias ll='ls -alF'
 alias la='ls -A'
 alias l='ls -CF'
+alias utc='LC_TIME=C date -u'
 alias n='nvim'
 alias vim='nvim'
 alias dot='/usr/bin/git --git-dir=$HOME/.dotfiles --work-tree=$HOME'
