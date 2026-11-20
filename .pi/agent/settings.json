@@ -20,9 +20,9 @@
     "npm:@holysoles/pi-handoff"
   ],
   "enabledModels": [
-    "fallback/gpt-6-sol",
+    "fallback/gpt-6.2-sol",
     "fallback/gpt-6-luna",
-    "fallback/gpt-6-astra",
+    "fallback/gpt-6.2-astra",
     "fallback/gpt-5.6-terra",
     "enmaas/rits/zai-org/glm-5-3"
   ],
@@ -44,10 +44,10 @@
     ],
     "agentOverrides": {
       "reviewer": {
-        "model": "fallback/gpt-6-sol"
+        "model": "fallback/gpt-6.2-sol"
       },
       "oracle": {
-        "model": "fallback/gpt-6-sol"
+        "model": "fallback/gpt-6.2-sol"
       },
       "worker": {
         "model": "fallback/gpt-6-luna"
@@ -56,14 +56,14 @@
   },
   "privateLlmGateway": {
     "models": {
-      "gpt-6-sol": {
+      "gpt-6.2-sol": {
         "private": {
           "provider": "enmaas",
-          "id": "gpt-6-sol"
+          "id": "gpt-6.2-sol"
         },
         "public": {
           "provider": "openai",
-          "id": "gpt-6-sol"
+          "id": "gpt-6.2-sol"
         }
       },
       "gpt-6-luna": {
@@ -76,14 +76,14 @@
           "id": "gpt-6-luna"
         }
       },
-      "gpt-6-astra": {
+      "gpt-6.2-astra": {
         "private": {
           "provider": "enmaas",
-          "id": "gpt-6-astra"
+          "id": "gpt-6.2-astra"
         },
         "public": {
           "provider": "openai",
-          "id": "gpt-6-astra"
+          "id": "gpt-6.2-astra"
         }
       },
       "gpt-5.6-terra": {
