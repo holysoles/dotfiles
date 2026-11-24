@@ -22,6 +22,10 @@
         "aws___read_documentation": "codemode",
         "aws___retrieve_skill": "codemode"
       }
+    },
+    "red-hat-documentation": {
+      "url": "https://docs-mcp.api.redhat.com/mcp",
+      "exposure": "codemode"
     }
   }
 }

@@ -35,9 +35,6 @@
   "env": {
     "GIT_EDITOR": "true"
   },
-  "extensions": [
-    "-builtin:mcp"
-  ],
   "subagents": {
     "defaultSubagentOnlyExtensions": [
       "~/.pi/agent/npm/node_modules/@holysoles/pi-gatewayhelper/index.ts"
