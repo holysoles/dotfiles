@@ -75,7 +75,7 @@
       "bash -n *": "allow",
       ":": "allow",
 
-      "pi --help": "allow",
+      "pi *--help": "allow",
 
       "git *": "ask",
       "git log *": "allow",
@@ -91,6 +91,7 @@
       "git checkout -- *": "allow",
       "git switch *": "allow",
       "git ls-files *": "allow",
+      "git mv *": "allow",
       "git ls-tree *": "allow",
       "git ls-remote *": "allow",
       "git blame *": "allow",
@@ -111,7 +112,7 @@
       "kubectl logs *": "allow",
       "kubectl wait *": "allow",
       "oc *": "ask",
-      "oc * --help": "allow",
+      "oc *--help": "allow",
       "oc project": "allow",
       "oc get *": "allow",
       "oc describe *": "allow",
@@ -128,7 +129,8 @@
       "oc whoami *": "allow",
       "oc api-resources *": "allow",
       "ocm *": "ask",
-      "ocm * --help": "allow",
+      "ocm *--help": "allow",
+      "ocm help *": "allow",
       "ocm get *": "allow",
       "ocm list *": "allow",
       "ocm describe *": "allow",
@@ -138,9 +140,9 @@
       "ocm backplane *": "ask",
       "ocm backplane status": "allow",
       "ocm backplane login --readonly *": "allow",
-      "ocm-container * --help": "allow",
+      "ocm-container *--help": "allow",
       
-      "osdctl * --help": "allow",
+      "osdctl *--help": "allow",
       "osdctl org *": "allow",
       "osdctl rhobs *": "allow",
       "osdctl cluster context *": "allow",
@@ -151,10 +153,12 @@
       "osdctl servicelog list *": "allow",
       "osdctl cluster reports list *": "allow",
       "osdctl cloudtrail write-events *": "allow",
+      "osdctl alert list *": "allow",
+      "osdctl cluster etcd-health-check *": "allow",
 
       "rh-aws-saml-login --help": "allow",
       "rosa describe cluster *": "allow",
-      "rosa * --help": "allow",
+      "rosa *--help": "allow",
       "rosa-login --help": "allow",
 
       "rtk *": "allow",
@@ -194,6 +198,7 @@
       "aws cloudwatch get*": "allow",
       "aws cloudwatch describe*": "allow",
 
+      "pd *--help": "allow",
       "pd rest get *": "allow",
       "pd incident log *": "allow",
       "pd incident list *": "allow",
@@ -215,13 +220,15 @@
       "slackcli team info *": "allow",
       "slackcli user info *": "allow",
 
-      "acli * --help": "allow",
+      "acli *--help": "allow",
       "acli jira issue view *": "allow",
       "acli jira issue search *": "allow",
       "acli jira workitem view *": "allow",
       "acli jira workitem search *": "allow",
       "acli jira workitem comment list *": "allow",
 
+      "gh auth status": "allow",
+      "gh --version": "allow",
       "gh run list *": "allow",
       "gh run view *": "allow",
       "gh run watch *": "allow",
@@ -243,7 +250,7 @@
       "glab auth status *": "allow",
 
       "terraform *": "ask",
-      "terraform * --help": "allow",
+      "terraform *--help": "allow",
       "terraform version": "allow",
       "terraform validate *": "allow",
       "terraform * validate *": "allow",
@@ -268,6 +275,7 @@
       "prettier *": "allow",
       "eslint *": "allow",
       "gofmt *": "allow",
+      "go version": "allow",
       "go vet *": "allow",
       "go test *": "allow",
       "go env *": "allow",
@@ -293,6 +301,7 @@
       "npm view *": "allow",
       "npm stage view *": "allow",
       "npm pack --dry-run *": "allow",
+      "npm pkg get *": "allow",
 
       "pi --version": "allow",
 
@@ -308,6 +317,7 @@
       "~/code/*": "allow",
       "$HOME/go/pkg/mod/*": "allow",
       "/tmp": "allow",
+      "/tmp/*": "allow",
       "/host": "allow",
       "/dev/stdin": "allow",
 

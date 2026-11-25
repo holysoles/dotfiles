@@ -16,8 +16,8 @@
     "npm:@gotgenes/pi-permission-system",
     "npm:pi-lens",
     "npm:pi-context-view",
-    "npm:@holysoles/pi-gatewayhelper",
-    "npm:@holysoles/pi-handoff"
+    "npm:@holysoles/pi-handoff",
+    "npm:@holysoles/pi-gatewayhelper"
   ],
   "enabledModels": [
     "fallback/gpt-6.2-sol",
@@ -52,6 +52,11 @@
     }
   },
   "privateLlmGateway": {
+    "spend": {
+      "provider": "enmaas",
+      "dashboardOrigin": "https://dashboard.enmaas.devshift.net",
+      "showFooter": true
+    },
     "models": {
       "gpt-6.2-sol": {
         "private": {
@@ -96,9 +101,9 @@
     }
   },
   "extensionChangelogVersions": {
-    "{\"source\":\"npm:pi-subagents\",\"scope\":\"user\"}": "0.89.0",
-    "{\"source\":\"npm:@gotgenes/pi-permission-system\",\"scope\":\"user\"}": "42.1.0",
-    "{\"source\":\"npm:pi-lens\",\"scope\":\"user\"}": "4.5.1",
+    "{\"source\":\"npm:pi-subagents\",\"scope\":\"user\"}": "0.90.0",
+    "{\"source\":\"npm:@gotgenes/pi-permission-system\",\"scope\":\"user\"}": "42.2.1",
+    "{\"source\":\"npm:pi-lens\",\"scope\":\"user\"}": "4.5.2",
     "{\"source\":\"npm:pi-context-view\",\"scope\":\"user\"}": "0.8.4"
   }
 }

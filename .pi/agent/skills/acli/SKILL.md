@@ -39,6 +39,8 @@ an invalid parent in testing. Verify the created issue's `.fields.parent.key`,
 type, and team. Create once; retain the returned `.key` and don't retry blindly
 after a response failure.
 
+**Priority:** Set it in the creation JSON as `"additionalAttributes":{"priority":{"id":"<priority-id>"}}` alongside any team field. Priorities are project-specific: ROSAENG accepts `Minor` (`10004`) but rejected `Low` (`4`), even though `Low` is valid in other projects. Check `.fields.priority | {name,id}` on a work item in the target project. Ask before substituting a different priority, and verify `.fields.priority.name` after creation.
+
 ```sh
 acli jira workitem create --from-json file.json --json | jq '{key, status:.fields.status.name, team:.fields.customfield_10001.name}'
 acli jira workitem transition --key NEW-123 --status Backlog --yes
@@ -46,10 +48,14 @@ acli jira workitem link create --out BLOCKER-123 --in NEW-123 --type Blocks --ye
 acli jira workitem view NEW-123 --fields status,issuelinks,customfield_10001 --json | jq '{status:.fields.status.name, team:.fields.customfield_10001.name, links:.fields.issuelinks}'
 ```
 
-For `Blocks`, `--out` is the blocking ticket and `--in` is the blocked ticket.
-Transition output may not show the resulting status; verify with `view`. Check
-link direction and team in the returned fields, not just the command's success
-message.
+**Link direction:** `acli jira workitem link type --json` lists type names under `.issueLinkTypes[]`, but does not show their directional labels. For `Blocks`, `--out` is the blocking ticket and `--in` is the blocked ticket. For the new ticket to show **split from** the source, use:
+
+```sh
+acli jira workitem link create --out NEW-123 --in SOURCE-456 --type 'Work item split' --yes
+acli jira workitem view NEW-123 --fields issuelinks --json | jq '.fields.issuelinks[] | {id, label: (if .outwardIssue then .type.outward else .type.inward end), other: (.outwardIssue.key // .inwardIssue.key)}'
+```
+
+Verify the label and other ticket in `view`, not just the success message. If you just created a reversed link, delete that verified link ID with `acli jira workitem link delete --id LINK_ID --yes` before recreating it. Transition output may not show the resulting status; verify with `view`.
 
 For investigation notes, separate confirmed ticket details from findings inferred
 from comments or repository state. Don't invent dates: if the ticket has no
