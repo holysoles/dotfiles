@@ -191,6 +191,19 @@ function flux-retry-helm() {
 function ssh-hosts() {
     awk 'tolower($1) == "host" {print $2}' ~/.ssh/config
 }
+function pi-safe() {
+  HERE="$(realpath .)"
+  echo "Entering sandbox for $HERE"
+  bwrap \
+  --ro-bind / / \
+  --bind ~/.pi ~/.pi \
+  --dev-bind /dev/null /dev/null \
+  --dev-bind /dev/urandom /dev/urandom \
+  --tmpfs /tmp \
+  --bind "$HERE" "$HERE" \
+  --setenv PS1 "sandbox$ " \
+  bash -c "cd $HERE && exec $(which pi) $*"
+}
 if [ "$WORK" == "true" ]; then
     function cluster_function() {
         info="$(ocm backplane status 2> /dev/null)"
